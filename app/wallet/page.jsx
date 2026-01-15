@@ -381,9 +381,9 @@ export default function WalletPage() {
                 <span className="font-semibold text-gray-500">GiftPocket Bank</span>
               </div>
             </div>
-            <div className="bg-purple-50 border border-purple-100 rounded-xl p-4">
-              <p className="text-sm text-purple-700 font-medium mb-2">Important Instructions:</p>
-              <ul className="text-xs text-purple-600 space-y-1">
+            <div className="bg-[#1EB53A]/10 border border-[#1EB53A]/20 rounded-xl p-4">
+              <p className="text-sm text-[#1EB53A] font-medium mb-2">Important Instructions:</p>
+              <ul className="text-xs text-[#1EB53A] space-y-1">
                 <li>• Use your Wallet ID as payment reference</li>
                 <li>• Transfers usually reflect within 24 hours</li>
                 <li>• Contact support if funds don&apos;t reflect</li>
@@ -401,7 +401,7 @@ export default function WalletPage() {
                 <input 
                   type="text" 
                   placeholder="1234 5678 9012 3456" 
-                  className="w-full text-gray-500 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" 
+                  className="w-full text-gray-500 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1EB53A]" 
                   disabled={isProcessingPayment} 
                 />
               </div>
@@ -411,7 +411,7 @@ export default function WalletPage() {
                   <input 
                     type="text" 
                     placeholder="MM/YY" 
-                    className="w-full text-gray-500 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" 
+                    className="w-full text-gray-500 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1EB53A]" 
                     disabled={isProcessingPayment} 
                   />
                 </div>
@@ -420,14 +420,14 @@ export default function WalletPage() {
                   <input 
                     type="text" 
                     placeholder="123" 
-                    className="w-full text-gray-500 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" 
+                    className="w-full text-gray-500 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1EB53A]" 
                     disabled={isProcessingPayment} 
                   />
                 </div>
               </div>
             </div>
-            <div className="bg-blue-50 rounded-xl p-3">
-              <p className="text-xs text-blue-600">Card payments are secured with SSL encryption</p>
+            <div className="bg-[#1EB53A]/10 rounded-xl p-3">
+              <p className="text-xs text-[#1EB53A]">Card payments are secured with SSL encryption</p>
             </div>
           </div>
         );
@@ -440,14 +440,14 @@ export default function WalletPage() {
               <input 
                 type="tel" 
                 placeholder="0800 000 0000" 
-                className="w-full text-gray-500 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" 
+                className="w-full text-gray-500 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1EB53A]" 
                 disabled={isProcessingPayment} 
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Provider</label>
               <select 
-                className="w-full text-gray-500 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" 
+                className="w-full text-gray-500 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1EB53A]" 
                 disabled={isProcessingPayment}
               >
                 <option>MTN Mobile Money</option>
@@ -490,9 +490,9 @@ export default function WalletPage() {
       
       switch(tx.category) {
         case "gift":
-          return <Gift className="w-5 h-5 text-purple-600" />;
+          return <Gift className="w-5 h-5 text-[#1EB53A]" />;
         case "topup":
-          return <ArrowDownLeft className="w-5 h-5 text-green-600" />;
+          return <ArrowDownLeft className="w-5 h-5 text-[#1EB53A]" />;
         case "transfer":
           return <ArrowUpRight className="w-5 h-5 text-red-600" />;
         case "payment":
@@ -500,7 +500,7 @@ export default function WalletPage() {
         default:
           return isDebit ? 
             <ArrowUpRight className="w-5 h-5 text-red-600" /> : 
-            <ArrowDownLeft className="w-5 h-5 text-green-600" />;
+            <ArrowDownLeft className="w-5 h-5 text-[#1EB53A]" />;
       }
     };
 
@@ -508,7 +508,7 @@ export default function WalletPage() {
     const getIconBgColor = () => {
       if (isFailed) return "bg-red-50";
       if (isPending) return "bg-yellow-50";
-      if (isCredit) return "bg-green-50";
+      if (isCredit) return "bg-[#1EB53A]/10";
       return "bg-red-50";
     };
 
@@ -537,7 +537,7 @@ export default function WalletPage() {
     const getStatusBadge = () => {
       if (isFailed) return "bg-red-100 text-red-700";
       if (isPending) return "bg-yellow-100 text-yellow-700";
-      return "bg-green-100 text-green-700";
+      return "bg-[#1EB53A]/10 text-[#1EB53A]";
     };
 
     // Get status text
@@ -584,7 +584,7 @@ export default function WalletPage() {
         </div>
 
         <div className="flex flex-col items-end gap-1">
-          <div className={`text-lg font-semibold ${isFailed ? 'text-red-600' : isDebit ? 'text-gray-800' : 'text-green-600'}`}>
+          <div className={`text-lg font-semibold ${isFailed ? 'text-red-600' : isDebit ? 'text-gray-800' : 'text-[#1EB53A]'}`}>
             {isDebit ? '-' : '+'}₦{Math.abs(tx.amount || 0).toLocaleString()}
           </div>
           
@@ -602,15 +602,15 @@ export default function WalletPage() {
 
   if (status === "loading" || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-        <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-white p-6">
+        <Loader2 className="w-8 h-8 text-[#1EB53A] animate-spin" />
         <span className="ml-3 text-gray-500 font-medium">Loading your wallet...</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen bg-white p-4 md:p-6">
       {/* Add Money Modal */}
       {showAddMoneyModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -630,10 +630,10 @@ export default function WalletPage() {
               <div className="bg-gray-50 rounded-xl p-4 mb-4">
                 <p className="text-sm font-medium text-gray-700 mb-1">Your Wallet ID</p>
                 <div className="flex items-center justify-between">
-                  <code className="font-mono text-lg font-bold text-purple-600">{walletId}</code>
+                  <code className="font-mono text-lg font-bold text-[#1EB53A]">{walletId}</code>
                   <button
                     onClick={handleCopyWalletId}
-                    className="flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-1 bg-[#1EB53A]/10 text-[#1EB53A] rounded-lg hover:bg-[#1EB53A]/20 transition-colors text-sm disabled:opacity-50"
                     disabled={isProcessingPayment}
                   >
                     {copied ? (
@@ -664,8 +664,8 @@ export default function WalletPage() {
                       disabled={isProcessingPayment}
                       className={`p-3 rounded-xl border text-gray-500 transition-all disabled:opacity-50 ${
                         selectedAmount === amount 
-                          ? 'border-purple-600 bg-purple-50 text-purple-700 font-semibold' 
-                          : 'border-gray-200 hover:border-purple-300'
+                          ? 'border-[#1EB53A] bg-[#1EB53A]/10 text-[#1EB53A] font-semibold' 
+                          : 'border-gray-200 hover:border-[#1EB53A]/50'
                       }`}
                     >
                       ₦{amount.toLocaleString()}
@@ -682,7 +682,7 @@ export default function WalletPage() {
                       value={customAmount}
                       onChange={handleCustomAmountChange}
                       placeholder="Enter amount"
-                      className="w-full text-gray-500 pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50"
+                      className="w-full text-gray-500 pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent disabled:opacity-50"
                       disabled={isProcessingPayment}
                     />
                   </div>
@@ -699,16 +699,16 @@ export default function WalletPage() {
                       disabled={isProcessingPayment}
                       className={`p-4 rounded-xl border transition-all text-left disabled:opacity-50 ${
                         paymentMethod === method.id 
-                          ? 'border-purple-600 bg-purple-50' 
-                          : 'border-gray-200 hover:border-purple-300'
+                          ? 'border-[#1EB53A] bg-[#1EB53A]/10' 
+                          : 'border-gray-200 hover:border-[#1EB53A]/50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-lg ${
-                          paymentMethod === method.id ? 'bg-purple-100' : 'bg-gray-100'
+                          paymentMethod === method.id ? 'bg-[#1EB53A]/20' : 'bg-gray-100'
                         }`}>
                           <method.icon className={`w-5 h-5 ${
-                            paymentMethod === method.id ? 'text-purple-600' : 'text-gray-600'
+                            paymentMethod === method.id ? 'text-[#1EB53A]' : 'text-gray-600'
                           }`} />
                         </div>
                         <div>
@@ -738,7 +738,7 @@ export default function WalletPage() {
                   disabled={selectedAmount < 100 || isProcessingPayment}
                   className={`px-8 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2 ${
                     selectedAmount >= 100 && !isProcessingPayment
-                      ? 'bg-purple-600 text-white hover:bg-purple-700'
+                      ? 'bg-[#1EB53A] text-white hover:bg-[#189531]'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
@@ -781,11 +781,11 @@ export default function WalletPage() {
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
                   selectedTransaction.type === "sent" || selectedTransaction.amount < 0
                     ? "bg-red-50"
-                    : "bg-green-50"
+                    : "bg-[#1EB53A]/10"
                 }`}>
                   {selectedTransaction.type === "sent" || selectedTransaction.amount < 0
                     ? <ArrowUpRight className="w-8 h-8 text-red-600" />
-                    : <ArrowDownLeft className="w-8 h-8 text-green-600" />
+                    : <ArrowDownLeft className="w-8 h-8 text-[#1EB53A]" />
                   }
                 </div>
                 <p className="text-2xl font-bold text-gray-800 mb-2">
@@ -803,7 +803,7 @@ export default function WalletPage() {
                       ? "bg-red-100 text-red-700"
                       : selectedTransaction.status === "pending"
                       ? "bg-yellow-100 text-yellow-700"
-                      : "bg-green-100 text-green-700"
+                      : "bg-[#1EB53A]/10 text-[#1EB53A]"
                   }`}>
                     {selectedTransaction.status?.charAt(0).toUpperCase() + selectedTransaction.status?.slice(1)}
                   </span>
@@ -842,7 +842,7 @@ export default function WalletPage() {
               <div className="pt-4 border-t">
                 <button
                   onClick={() => setShowTransactionDetail(false)}
-                  className="w-full py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors"
+                  className="w-full py-3 bg-[#1EB53A] text-white rounded-xl font-medium hover:bg-[#189531] transition-colors"
                 >
                   Close Details
                 </button>
@@ -857,7 +857,7 @@ export default function WalletPage() {
         <div className="mb-4">
           <button
             onClick={() => router.push("/")}
-            className="flex items-center gap-2 text-purple-600 font-medium hover:text-purple-800 transition-colors"
+            className="flex items-center gap-2 text-[#1EB53A] font-medium hover:text-[#189531] transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             Back to Home
@@ -871,7 +871,7 @@ export default function WalletPage() {
             <p className="text-gray-600">Manage your gift budget and transactions</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden md:block bg-white px-4 py-2 rounded-lg border">
+            <div className="hidden md:block bg-white px-4 py-2 rounded-lg border border-gray-200">
               <p className="text-sm text-gray-600">Wallet ID</p>
               <div className="flex items-center gap-2">
                 <code className="font-mono font-medium truncate max-w-30">{walletId || "Loading..."}</code>
@@ -882,7 +882,7 @@ export default function WalletPage() {
                   disabled={!walletId}
                 >
                   {copied ? (
-                    <Check className="w-4 h-4 text-green-600" />
+                    <Check className="w-4 h-4 text-[#1EB53A]" />
                   ) : (
                     <Copy className="w-4 h-4 text-gray-500" />
                   )}
@@ -891,7 +891,7 @@ export default function WalletPage() {
             </div>
             <button 
               onClick={handleAddMoney}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors disabled:opacity-50"
               disabled={walletLoading}
             >
               {walletLoading ? (
@@ -908,7 +908,7 @@ export default function WalletPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Wallet Card */}
-            <div className="bg-linear-to-br from-purple-600 to-purple-800 text-white rounded-2xl p-6 shadow-xl">
+            <div className="bg-[#1EB53A] text-white rounded-2xl p-6 shadow-xl">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <p className="text-sm opacity-90 mb-1">Available Balance</p>
@@ -948,7 +948,7 @@ export default function WalletPage() {
                 <button 
                   onClick={handleAddMoney}
                   disabled={walletLoading}
-                  className="flex-1 bg-white text-purple-600 px-4 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg"
+                  className="flex-1 bg-white text-[#1EB53A] px-4 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg"
                 >
                   {walletLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -971,7 +971,7 @@ export default function WalletPage() {
             </div>
 
             {/* Transactions Section */}
-            <div className="bg-white rounded-2xl shadow-sm">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
               <div className="p-6 border-b">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
@@ -987,7 +987,7 @@ export default function WalletPage() {
                         placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm w-full sm:w-48"
+                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent text-sm w-full sm:w-48"
                       />
                     </div>
                     
@@ -1008,7 +1008,7 @@ export default function WalletPage() {
                       onClick={() => setTimeFilter(filter.toLowerCase())}
                       className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
                         timeFilter === filter.toLowerCase()
-                          ? 'bg-purple-600 text-white'
+                          ? 'bg-[#1EB53A] text-white'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
@@ -1021,8 +1021,8 @@ export default function WalletPage() {
               <div className="p-6">
                 {walletLoading ? (
                   <div className="text-center py-12">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-50 rounded-full mb-4">
-                      <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1EB53A]/10 rounded-full mb-4">
+                      <Loader2 className="w-8 h-8 text-[#1EB53A] animate-spin" />
                     </div>
                     <p className="text-gray-500 font-medium">Loading transactions...</p>
                     <p className="text-sm text-gray-400 mt-1">Fetching your latest activities</p>
@@ -1054,7 +1054,7 @@ export default function WalletPage() {
                     <p className="text-gray-500 mb-6">Your transaction history will appear here</p>
                     <button
                       onClick={handleAddMoney}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       Make your first transaction
@@ -1067,7 +1067,7 @@ export default function WalletPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="bg-gray-50 rounded-xl p-4">
                         <p className="text-sm text-gray-600 mb-1">Total Credits</p>
-                        <p className="text-xl font-bold text-green-600">
+                        <p className="text-xl font-bold text-[#1EB53A]">
                           ₦{transactions
                             .filter(tx => !(tx.type === "sent" || tx.amount < 0))
                             .reduce((sum, tx) => sum + Math.abs(tx.amount || 0), 0)
@@ -1099,7 +1099,7 @@ export default function WalletPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Stats */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <h3 className="font-semibold text-gray-800 mb-4">Spending Overview</h3>
               {walletLoading ? (
                 <div className="text-center py-4">
@@ -1138,7 +1138,7 @@ export default function WalletPage() {
             </div>
 
             {/* Spending by Category */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <h3 className="font-semibold text-gray-800 mb-4">Spending by Category</h3>
               {walletLoading ? (
                 <div className="text-center py-4">
@@ -1154,7 +1154,7 @@ export default function WalletPage() {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-purple-600 h-2 rounded-full"
+                          className="bg-[#1EB53A] h-2 rounded-full"
                           style={{ width: `${stat.percentage}%` }}
                         ></div>
                       </div>
@@ -1173,7 +1173,7 @@ export default function WalletPage() {
             </div>
 
             {/* Budget Setting */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <h3 className="font-semibold text-gray-800 mb-4">Monthly Budget</h3>
               {walletLoading ? (
                 <div className="text-center py-4">
@@ -1205,10 +1205,10 @@ export default function WalletPage() {
             </div>
 
             {/* Wallet ID Card */}
-            <div className="bg-linear-to-br from-purple-50 to-pink-50 border border-purple-100 rounded-2xl p-6 shadow-sm">
+            <div className="bg-[#1EB53A]/10 border border-[#1EB53A]/20 rounded-2xl p-6 shadow-sm">
               <h3 className="font-semibold text-gray-800 mb-3">Your Wallet ID</h3>
               <div className="bg-white rounded-lg p-4 mb-3">
-                <code className="font-mono font-bold text-lg text-purple-600 block text-center mb-2 truncate">
+                <code className="font-mono font-bold text-lg text-[#1EB53A] block text-center mb-2 truncate">
                   {walletId || "Loading..."}
                 </code>
                 <p className="text-xs text-gray-500 text-center">
@@ -1218,7 +1218,7 @@ export default function WalletPage() {
               <button
                 onClick={handleCopyWalletId}
                 disabled={!walletId || walletLoading}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors text-sm disabled:opacity-50"
               >
                 {copied ? (
                   <>
@@ -1238,7 +1238,7 @@ export default function WalletPage() {
 
         {/* Empty State CTA */}
         {!walletLoading && balance === 0 && (
-          <div className="mt-8 bg-linear-to-r from-purple-50 to-pink-50 border border-purple-100 rounded-2xl p-6">
+          <div className="mt-8 bg-[#1EB53A]/10 border border-[#1EB53A]/20 rounded-2xl p-6">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-4 md:mb-0">
                 <h3 className="font-semibold text-gray-800 text-lg">Ready to start gifting?</h3>
@@ -1246,14 +1246,8 @@ export default function WalletPage() {
               </div>
               <div className="flex gap-3">
                 <button
-                  onClick={handleAddMoney}
-                  className="bg-purple-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors"
-                >
-                  Add Money Now
-                </button>
-                <button
                   onClick={() => router.push('/GiftsPage')}
-                  className="bg-white text-purple-600 border border-purple-200 px-5 py-2 rounded-lg font-medium hover:bg-purple-50 transition-colors"
+                  className="bg-white text-[#1EB53A] border border-[#1EB53A]/30 px-5 py-2 rounded-lg font-medium hover:bg-[#1EB53A]/10 transition-colors"
                 >
                   Browse Gifts
                 </button>

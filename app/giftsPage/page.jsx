@@ -2830,7 +2830,7 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
   );
 };
 
-// Main Component - Updated with green colors
+// Main Component - Updated with OPay green colors
 export default function GiftsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -2991,10 +2991,10 @@ export default function GiftsPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-linear-to-br from-green-50 to-emerald-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-green-600 font-medium">Loading gifts...</p>
+          <div className="w-12 h-12 border-4 border-[#1EB53A] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-700 font-medium">Loading gifts...</p>
         </div>
       </div>
     );
@@ -3004,9 +3004,9 @@ export default function GiftsPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-br from-green-50 via-emerald-50 to-teal-50">
+      <div className="min-h-screen bg-white">
         {/* Enhanced Header */}
-        <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b shadow-sm">
+        <header className="sticky top-0 z-50 bg-white backdrop-blur-lg border-b border-gray-200 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center gap-4">
@@ -3014,19 +3014,19 @@ export default function GiftsPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => router.back()}
-                  className="p-2 hover:bg-green-50 rounded-xl transition-colors"
+                  className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
                 >
-                  <ArrowLeft className="w-5 h-5 text-green-600" />
+                  <ArrowLeft className="w-5 h-5 text-gray-700" />
                 </motion.button>
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="w-10 h-10 bg-linear-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[#1EB53A] rounded-xl flex items-center justify-center">
                       <Gift className="w-6 h-6 text-white" />
                     </div>
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white"></div>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                    <h1 className="text-xl font-bold text-gray-900">
                       GiftPocket Gifts
                     </h1>
                     <p className="text-xs text-gray-500">Thoughtful gifts, delivered with love</p>
@@ -3039,7 +3039,7 @@ export default function GiftsPage() {
                 <div className="hidden md:flex items-center gap-2">
                   <button
                     onClick={() => setShowBudgetInput(!showBudgetInput)}
-                    className="flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-700 hover:shadow-sm transition-all"
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-gray-700 hover:shadow-sm transition-all"
                   >
                     <Wallet className="w-4 h-4" />
                     <span className="font-medium">Budget</span>
@@ -3055,14 +3055,14 @@ export default function GiftsPage() {
                         placeholder="₦ Max"
                         value={budget || ''}
                         onChange={(e) => setBudget(e.target.value ? Number(e.target.value) : null)}
-                        className="w-32 px-3 py-2 border text-gray-800 border-yellow-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                        className="w-32 px-3 py-2 border text-gray-800 border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent"
                       />
                       {budget && (
                         <button
                           onClick={() => setBudget(null)}
-                          className="p-1 hover:bg-yellow-100 rounded-lg"
+                          className="p-1 hover:bg-gray-100 rounded-lg"
                         >
-                          <X className="w-4 h-4 text-yellow-600" />
+                          <X className="w-4 h-4 text-gray-600" />
                         </button>
                       )}
                     </motion.div>
@@ -3070,10 +3070,10 @@ export default function GiftsPage() {
                 </div>
 
                 {/* View Toggle */}
-                <div className="hidden md:flex items-center bg-green-100 p-1 rounded-xl">
+                <div className="hidden md:flex items-center bg-gray-100 p-1 rounded-xl">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-green-600 text-white shadow' : 'text-green-600 hover:bg-green-200'}`}
+                    className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[#1EB53A] text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}
                   >
                     <div className="w-4 h-4">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -3086,7 +3086,7 @@ export default function GiftsPage() {
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-green-600 text-white shadow' : 'text-green-600 hover:bg-green-200'}`}
+                    className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[#1EB53A] text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}
                   >
                     <div className="w-4 h-4">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -3106,19 +3106,19 @@ export default function GiftsPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowCart(true)}
-                  className="relative p-3 bg-green-50 rounded-xl hover:shadow-md transition-all"
+                  className="relative p-3 bg-gray-50 rounded-xl hover:shadow-md transition-all"
                 >
-                  <ShoppingCart className="w-5 h-5 text-green-600" />
+                  <ShoppingCart className="w-5 h-5 text-gray-700" />
                   {cart.length > 0 && (
                     <>
                       <motion.span
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+                        className="absolute -top-1 -right-1 bg-[#1EB53A] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
                       >
                         {cart.reduce((sum, item) => sum + item.quantity, 0)}
                       </motion.span>
-                      <div className="absolute -bottom-1 inset-x-0 h-1 bg-green-600 rounded-full"></div>
+                      <div className="absolute -bottom-1 inset-x-0 h-1 bg-[#1EB53A] rounded-full"></div>
                     </>
                   )}
                 </motion.button>
@@ -3128,13 +3128,13 @@ export default function GiftsPage() {
         </header>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Hero Section - Updated with green colors */}
+          {/* Hero Section - Updated with OPay green */}
           <div className="mb-8">
-            <div className="bg-linear-to-r from-green-500 to-emerald-600 rounded-2xl p-8 text-white overflow-hidden relative">
+            <div className="bg-[#1EB53A] rounded-2xl p-8 text-white overflow-hidden relative">
               <div className="absolute inset-0 bg-black/10"></div>
               <div className="relative z-10 max-w-2xl">
                 <h2 className="text-3xl font-bold mb-4">Find the Perfect Nigerian Gift 🎁</h2>
-                <p className="text-green-100 mb-6">
+                <p className="text-white/90 mb-6">
                   From spicy suya to beautiful Ankara, discover thoughtful gifts that celebrate Nigerian culture.
                   Perfect for birthdays, weddings, and special occasions.
                 </p>
@@ -3163,9 +3163,9 @@ export default function GiftsPage() {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
             <div className="lg:w-64 shrink-0">
-              <div className="bg-white rounded-2xl shadow-sm border p-6 sticky top-24">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-24">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-bold text-green-800 flex items-center gap-2">
+                  <h3 className="font-bold text-gray-900 flex items-center gap-2">
                     <Filter className="w-4 h-4" />
                     Filters
                   </h3>
@@ -3177,7 +3177,7 @@ export default function GiftsPage() {
                       setSelectedTags([]);
                       setBudget(null);
                     }}
-                    className="text-sm text-green-600 hover:text-green-700"
+                    className="text-sm text-[#1EB53A] hover:text-[#189531]"
                   >
                     Clear all
                   </button>
@@ -3185,7 +3185,7 @@ export default function GiftsPage() {
 
                 {/* Price Range */}
                 <div className="mb-6">
-                  <h4 className="font-semibold text-green-700 mb-3">Price Range</h4>
+                  <h4 className="font-semibold text-gray-700 mb-3">Price Range</h4>
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -3196,9 +3196,9 @@ export default function GiftsPage() {
                           setSelectedPriceRange("all");
                           setPriceRange([0, 1000000]);
                         }}
-                        className="text-green-600 focus:ring-green-500"
+                        className="text-[#1EB53A] focus:ring-[#1EB53A]"
                       />
-                      <span className="text-sm text-green-600">All Prices</span>
+                      <span className="text-sm text-gray-600">All Prices</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -3209,9 +3209,9 @@ export default function GiftsPage() {
                           setSelectedPriceRange("Under ₦5,000");
                           setPriceRange([0, 5000]);
                         }}
-                        className="text-green-600 focus:ring-green-500"
+                        className="text-[#1EB53A] focus:ring-[#1EB53A]"
                       />
-                      <span className="text-sm text-green-600">Under ₦5,000</span>
+                      <span className="text-sm text-gray-600">Under ₦5,000</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -3222,9 +3222,9 @@ export default function GiftsPage() {
                           setSelectedPriceRange("₦5,000 - ₦15,000");
                           setPriceRange([5000, 15000]);
                         }}
-                        className="text-green-600 focus:ring-green-500"
+                        className="text-[#1EB53A] focus:ring-[#1EB53A]"
                       />
-                      <span className="text-sm text-green-600">₦5,000 - ₦15,000</span>
+                      <span className="text-sm text-gray-600">₦5,000 - ₦15,000</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -3235,16 +3235,16 @@ export default function GiftsPage() {
                           setSelectedPriceRange("₦15,000 - ₦30,000");
                           setPriceRange([15000, 30000]);
                         }}
-                        className="text-green-600 focus:ring-green-500"
+                        className="text-[#1EB53A] focus:ring-[#1EB53A]"
                       />
-                      <span className="text-sm text-green-600">₦15,000 - ₦30,000</span>
+                      <span className="text-sm text-gray-600">₦15,000 - ₦30,000</span>
                     </label>
                   </div>
                 </div>
 
                 {/* Tags Filter */}
                 <div className="mb-6">
-                  <h4 className="font-semibold text-green-700 mb-3">Tags</h4>
+                  <h4 className="font-semibold text-gray-700 mb-3">Tags</h4>
                   <div className="flex flex-wrap gap-2">
                     {allTags.slice(0, 10).map(tag => (
                       <button
@@ -3258,8 +3258,8 @@ export default function GiftsPage() {
                         }}
                         className={`px-3 py-1.5 rounded-full text-sm transition-all ${
                           selectedTags.includes(tag)
-                            ? 'bg-green-600 text-white'
-                            : 'bg-green-50 text-green-600 hover:bg-green-100'
+                            ? 'bg-[#1EB53A] text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
                         {tag}
@@ -3281,9 +3281,9 @@ export default function GiftsPage() {
                           setSelectedTags(prev => prev.filter(t => !['local', 'handmade'].includes(t)));
                         }
                       }}
-                      className="rounded border-green-300 text-green-600 focus:ring-green-500"
+                      className="rounded border-gray-300 text-[#1EB53A] focus:ring-[#1EB53A]"
                     />
-                    <span className="text-sm text-green-600">Local & Handmade</span>
+                    <span className="text-sm text-gray-600">Local & Handmade</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -3296,9 +3296,9 @@ export default function GiftsPage() {
                           setSelectedTags(prev => prev.filter(t => !['eco', 'sustainable'].includes(t)));
                         }
                       }}
-                      className="rounded border-green-300 text-green-600 focus:ring-green-500"
+                      className="rounded border-gray-300 text-[#1EB53A] focus:ring-[#1EB53A]"
                     />
-                    <span className="text-sm text-green-600">Eco-friendly</span>
+                    <span className="text-sm text-gray-600">Eco-friendly</span>
                   </label>
                 </div>
               </div>
@@ -3307,23 +3307,23 @@ export default function GiftsPage() {
             {/* Main Content Area */}
             <div className="flex-1">
               {/* Search and Sort Bar */}
-              <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
                 <div className="flex flex-col lg:flex-row gap-4">
                   <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-400 w-5 h-5" />
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                       type="text"
                       placeholder="Search gifts by name, category, or tag..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full text-gray-700 pl-12 pr-4 py-3 bg-green-50 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full text-gray-700 pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent"
                     />
                   </div>
                   <div className="flex items-center gap-3">
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="bg-green-50 text-green-700 border border-green-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none pr-10"
+                      className="bg-gray-50 text-gray-700 border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent appearance-none pr-10"
                     >
                       {sortOptions.map(option => (
                         <option key={option.id} value={option.id}>
@@ -3331,11 +3331,11 @@ export default function GiftsPage() {
                         </option>
                       ))}
                     </select>
-                    <ChevronDown className="w-4 h-4 text-green-400 -ml-8 pointer-events-none" />
+                    <ChevronDown className="w-4 h-4 text-gray-400 -ml-8 pointer-events-none" />
                   </div>
                 </div>
 
-                {/* Category Chips - Updated with green colors */}
+                {/* Category Chips - Updated with OPay colors */}
                 <div className="flex flex-wrap gap-2 mt-6">
                   {categories.map(category => {
                     const Icon = category.icon;
@@ -3345,8 +3345,8 @@ export default function GiftsPage() {
                         onClick={() => setSelectedCategory(category.id)}
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
                           selectedCategory === category.id
-                            ? `${category.color} text-white shadow-md`
-                            : 'bg-green-50 text-green-600 hover:bg-green-100'
+                            ? 'bg-[#1EB53A] text-white shadow-md'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
                         <Icon className="w-4 h-4" />
@@ -3354,7 +3354,7 @@ export default function GiftsPage() {
                         <span className={`text-xs px-1.5 py-0.5 rounded-full ${
                           selectedCategory === category.id
                             ? 'bg-white/20'
-                            : 'bg-green-200'
+                            : 'bg-gray-200 text-gray-700'
                         }`}>
                           {nigerianGifts.filter(g => 
                             category.id === 'all' || g.category === category.id
@@ -3366,51 +3366,51 @@ export default function GiftsPage() {
                 </div>
               </div>
 
-              {/* Stats Bar - Updated with green colors */}
+              {/* Stats Bar - Updated with OPay colors */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-white p-4 rounded-2xl border shadow-sm">
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                      <Package className="w-5 h-5 text-green-600" />
+                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                      <Package className="w-5 h-5 text-gray-700" />
                     </div>
                     <div>
-                      <p className="text-sm text-green-500">Total Gifts</p>
-                      <p className="text-xl font-bold text-green-800">{filteredGifts.length}</p>
+                      <p className="text-sm text-gray-500">Total Gifts</p>
+                      <p className="text-xl font-bold text-gray-900">{filteredGifts.length}</p>
                     </div>
                   </div>
                 </div>
-                <div className="bg-white p-4 rounded-2xl border shadow-sm">
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-emerald-600" />
+                    <div className="w-10 h-10 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-[#1EB53A]" />
                     </div>
                     <div>
-                      <p className="text-sm text-emerald-500">Popular Today</p>
-                      <p className="text-xl font-bold text-emerald-800">
+                      <p className="text-sm text-gray-500">Popular Today</p>
+                      <p className="text-xl font-bold text-gray-900">
                         {filteredGifts.filter(g => g.popular).length}
                       </p>
                     </div>
                   </div>
                 </div>
-                <div className="bg-white p-4 rounded-2xl border shadow-sm">
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center">
-                      <Zap className="w-5 h-5 text-teal-600" />
+                    <div className="w-10 h-10 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-[#1EB53A]" />
                     </div>
                     <div>
-                      <p className="text-sm text-teal-500">Fast Delivery</p>
-                      <p className="text-xl font-bold text-teal-800">Same schedule Day</p>
+                      <p className="text-sm text-gray-500">Fast Delivery</p>
+                      <p className="text-xl font-bold text-gray-900">Same schedule Day</p>
                     </div>
                   </div>
                 </div>
-                <div className="bg-white p-4 rounded-2xl border shadow-sm">
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-lime-100 rounded-xl flex items-center justify-center">
-                      <Crown className="w-5 h-5 text-lime-600" />
+                    <div className="w-10 h-10 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center">
+                      <Crown className="w-5 h-5 text-[#1EB53A]" />
                     </div>
                     <div>
-                      <p className="text-sm text-lime-500">Top Rated</p>
-                      <p className="text-xl font-bold text-lime-800">
+                      <p className="text-sm text-gray-500">Top Rated</p>
+                      <p className="text-xl font-bold text-gray-900">
                         {filteredGifts.filter(g => g.rating >= 4.5).length}
                       </p>
                     </div>
@@ -3420,10 +3420,10 @@ export default function GiftsPage() {
 
               {/* Gifts Grid/List */}
               {filteredGifts.length === 0 ? (
-                <div className="bg-white rounded-2xl border p-12 text-center">
-                  <Gift className="w-16 h-16 text-green-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-green-700 mb-2">No gifts found</h3>
-                  <p className="text-green-500 mb-6">Try adjusting your filters or search term</p>
+                <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
+                  <Gift className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-700 mb-2">No gifts found</h3>
+                  <p className="text-gray-500 mb-6">Try adjusting your filters or search term</p>
                   <button
                     onClick={() => {
                       setSearchTerm('');
@@ -3431,7 +3431,7 @@ export default function GiftsPage() {
                       setSelectedTags([]);
                       setBudget(null);
                     }}
-                    className="px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 hover:shadow-lg transition-all"
+                    className="px-6 py-3 bg-[#1EB53A] text-white rounded-xl font-semibold hover:bg-[#189531] hover:shadow-lg transition-all"
                   >
                     Reset Filters
                   </button>
@@ -3469,10 +3469,10 @@ export default function GiftsPage() {
                   {recommendedGifts.length > 0 && (
                     <div className="mt-12">
                       <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-bold text-green-800">
+                        <h3 className="text-xl font-bold text-gray-900">
                           Recommended for you
                         </h3>
-                        <div className="flex items-center gap-2 text-green-600">
+                        <div className="flex items-center gap-2 text-[#1EB53A]">
                           <Target className="w-4 h-4" />
                           <span className="text-sm font-medium">Based on your cart</span>
                         </div>
@@ -3482,24 +3482,24 @@ export default function GiftsPage() {
                           <motion.div
                             key={gift.id}
                             whileHover={{ y: -4 }}
-                            className="bg-white rounded-xl border p-4 hover:shadow-md transition-all"
+                            className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-all"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-                                <Gift className="w-5 h-5 text-green-600" />
+                              <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center">
+                                <Gift className="w-5 h-5 text-gray-600" />
                               </div>
                               <div>
-                                <h4 className="font-semibold text-green-800 line-clamp-1">
+                                <h4 className="font-semibold text-gray-900 line-clamp-1">
                                   {gift.name}
                                 </h4>
-                                <p className="text-sm text-green-600 font-bold">
+                                <p className="text-sm text-[#1EB53A] font-bold">
                                   ₦{gift.price.toLocaleString()}
                                 </p>
                               </div>
                             </div>
                             <button
                               onClick={() => handleAddToCart(gift)}
-                              className="w-full mt-3 py-2 bg-green-50 text-green-600 rounded-lg font-medium hover:bg-green-100 transition-colors"
+                              className="w-full mt-3 py-2 bg-[#1EB53A] text-white rounded-lg font-medium hover:bg-[#189531] transition-colors"
                             >
                               Add to Cart
                             </button>

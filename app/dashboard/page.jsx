@@ -4,14 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { LayoutDashboard, Wallet, Gift, Calendar, Users, LogOut, Plus, ShoppingCart, Clock, ArrowRight, Sparkles, Zap, ArrowUpRight, ArrowDownLeft, TrendingUp, BarChart3, CreditCard, Bell, Settings, Search, Filter, Eye, EyeOff, ChevronRight, Download, MoreVertical, CheckCircle, XCircle, AlertCircle, Menu, X } from "lucide-react";
 
-// Action Card Component
-function ActionCard({ label, icon, description, onClick, color = "purple" }) {
+// Action Card Component - Updated with green colors
+function ActionCard({ label, icon, description, onClick, color = "green" }) {
   const colorClasses = {
-    purple: "bg-purple-50 text-purple-600 hover:bg-purple-100",
-    blue: "bg-blue-50 text-blue-600 hover:bg-blue-100",
     green: "bg-green-50 text-green-600 hover:bg-green-100",
-    pink: "bg-pink-50 text-pink-600 hover:bg-pink-100",
-    orange: "bg-orange-50 text-orange-600 hover:bg-orange-100"
+    blue: "bg-blue-50 text-blue-600 hover:bg-blue-100",
+    emerald: "bg-emerald-50 text-emerald-600 hover:bg-emerald-100",
+    teal: "bg-teal-50 text-teal-600 hover:bg-teal-100",
+    lime: "bg-lime-50 text-lime-600 hover:bg-lime-100"
   };
   
   return (
@@ -23,7 +23,7 @@ function ActionCard({ label, icon, description, onClick, color = "purple" }) {
         {icon}
       </div>
       <p className="font-semibold text-xs md:text-sm">{label}</p>
-      <p className="text-xs opacity-80 mt-0.5 md:mt-1">{description}</p>
+      <p className="text-xs text-gray-600 mt-0.5 md:mt-1">{description}</p>
     </button>
   );
 }
@@ -201,7 +201,7 @@ export default function Dashboard() {
     if (isFailed) return <XCircle className="w-5 h-5 text-red-600" />;
     if (isPending) return <AlertCircle className="w-5 h-5 text-yellow-600" />;
     if (transaction.category === 'gift') {
-      return <Gift className="w-5 h-5 text-purple-600" />;
+      return <Gift className="w-5 h-5 text-green-600" />;
     }
     return isCredit ? <ArrowDownLeft className="w-5 h-5 text-green-600" /> : <ArrowUpRight className="w-5 h-5 text-red-600" />;
   };
@@ -221,7 +221,7 @@ export default function Dashboard() {
               setFetchError(false);
               fetchDashboardData();
             }}
-            className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 transition-colors"
+            className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
           >
             Retry
           </button>
@@ -230,7 +230,7 @@ export default function Dashboard() {
               setFetchError(false);
               setLoading(false);
             }}
-            className="ml-3 bg-white text-purple-600 border border-purple-200 px-6 py-3 rounded-lg font-medium hover:bg-purple-50 transition-colors"
+            className="ml-3 bg-white text-green-600 border border-green-200 px-6 py-3 rounded-lg font-medium hover:bg-green-50 transition-colors"
           >
             Continue Anyway
           </button>
@@ -244,7 +244,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 font-medium">Loading your dashboard...</p>
           {loadingTimeout && (
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg max-w-md">
@@ -255,7 +255,7 @@ export default function Dashboard() {
                     setLoading(false);
                     setLoadingTimeout(false);
                   }}
-                  className="text-purple-600 underline hover:text-purple-800"
+                  className="text-green-600 underline hover:text-green-800"
                 >
                   Show dashboard anyway
                 </button>
@@ -277,7 +277,7 @@ export default function Dashboard() {
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-linear-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center">
                     <Gift className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -298,7 +298,7 @@ export default function Dashboard() {
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
               <nav className="space-y-1">
@@ -309,7 +309,7 @@ export default function Dashboard() {
                       router.push(item.href);
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm transition-all duration-200 text-gray-600 hover:bg-purple-50 hover:text-purple-700"
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm transition-all duration-200 text-gray-600 hover:bg-green-50 hover:text-green-700"
                   >
                     <item.icon className="w-4.5 h-4.5" />
                     <span className="font-medium">{item.label}</span>
@@ -319,7 +319,7 @@ export default function Dashboard() {
             </div>
             <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 to-blue-500 text-white flex items-center justify-center font-semibold">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 text-white flex items-center justify-center font-semibold">
                   {session?.user?.name?.charAt(0)?.toUpperCase()}
                 </div>
                 <div className="flex-1">
@@ -343,7 +343,7 @@ export default function Dashboard() {
       <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:z-50 md:w-64 md:bg-white md:border-r md:shadow-lg md:flex md:flex-col">
         <div className="p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-linear-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center">
               <Gift className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -360,7 +360,7 @@ export default function Dashboard() {
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-gray-800 pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full text-gray-800 pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -369,7 +369,7 @@ export default function Dashboard() {
             <button
               key={item.id}
               onClick={() => router.push(item.href)}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm transition-all duration-200 text-gray-600 hover:bg-purple-50 hover:text-purple-700 hover:shadow-sm group"
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm transition-all duration-200 text-gray-600 hover:bg-green-50 hover:text-green-700 hover:shadow-sm group"
             >
               <item.icon className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
               <span className="font-medium">{item.label}</span>
@@ -379,7 +379,7 @@ export default function Dashboard() {
         </nav>
         <div className="mt-auto p-6 border-t">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 to-blue-500 text-white flex items-center justify-center font-semibold">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 text-white flex items-center justify-center font-semibold">
               {session?.user?.name?.charAt(0)?.toUpperCase()}
             </div>
             <div className="flex-1">
@@ -449,6 +449,7 @@ export default function Dashboard() {
         <div className="p-4 md:p-6">
           {/* Stats Overview - Responsive Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {/* Balance Card */}
             <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 shadow-sm">
               <div className="flex items-center justify-between mb-3 md:mb-4">
                 <div>
@@ -465,55 +466,59 @@ export default function Dashboard() {
                     </button>
                   </div>
                 </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-50 rounded-lg md:rounded-xl flex items-center justify-center">
-                  <Wallet className="w-5 md:w-6 h-5 md:h-6 text-purple-600" />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-lg md:rounded-xl flex items-center justify-center">
+                  <Wallet className="w-5 md:w-6 h-5 md:h-6 text-green-600" />
                 </div>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleAddMoney}
-                  className="flex-1 bg-purple-600 text-white px-3 md:px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors text-xs md:text-sm"
+                  className="flex-1 bg-green-600 text-white px-3 md:px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors text-xs md:text-sm"
                 >
                   Top Up
                 </button>
                 <button
                   onClick={handleViewWallet}
-                  className="flex-1 bg-white text-purple-600 border border-purple-200 px-3 md:px-4 py-2 rounded-lg font-medium hover:bg-purple-50 transition-colors text-xs md:text-sm"
+                  className="flex-1 bg-white text-green-600 border border-green-200 px-3 md:px-4 py-2 rounded-lg font-medium hover:bg-green-50 transition-colors text-xs md:text-sm"
                 >
                   Details
                 </button>
               </div>
             </div>
+
+            {/* Scheduled Gifts Card */}
             <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 shadow-sm">
               <div className="flex items-center justify-between mb-3 md:mb-4">
                 <div>
                   <p className="text-xs md:text-sm text-gray-600">Scheduled Gifts</p>
                   <h2 className="text-xl md:text-2xl font-bold text-gray-800">{scheduledGifts.length}</h2>
                 </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-lg md:rounded-xl flex items-center justify-center">
-                  <Calendar className="w-5 md:w-6 h-5 md:h-6 text-blue-600" />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-50 rounded-lg md:rounded-xl flex items-center justify-center">
+                  <Calendar className="w-5 md:w-6 h-5 md:h-6 text-emerald-600" />
                 </div>
               </div>
               <button
                 onClick={handleViewScheduled}
-                className="w-full bg-blue-50 text-blue-600 px-3 md:px-4 py-2 rounded-lg font-medium hover:bg-blue-100 transition-colors text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2"
+                className="w-full bg-emerald-50 text-emerald-600 px-3 md:px-4 py-2 rounded-lg font-medium hover:bg-emerald-100 transition-colors text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2"
               >
                 View All <ChevronRight className="w-3 md:w-4 h-3 md:h-4" />
               </button>
             </div>
+
+            {/* Recent Activity Card */}
             <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 shadow-sm sm:col-span-2 lg:col-span-1">
               <div className="flex items-center justify-between mb-3 md:mb-4">
                 <div>
                   <p className="text-xs md:text-sm text-gray-600">Recent Activity</p>
                   <h2 className="text-xl md:text-2xl font-bold text-gray-800">{recentGifts.length}</h2>
                 </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-lg md:rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-5 md:w-6 h-5 md:h-6 text-green-600" />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-teal-50 rounded-lg md:rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-5 md:w-6 h-5 md:h-6 text-teal-600" />
                 </div>
               </div>
               <button
                 onClick={handleViewWallet}
-                className="w-full bg-green-50 text-green-600 px-3 md:px-4 py-2 rounded-lg font-medium hover:bg-green-100 transition-colors text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2"
+                className="w-full bg-teal-50 text-teal-600 px-3 md:px-4 py-2 rounded-lg font-medium hover:bg-teal-100 transition-colors text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2"
               >
                 View Transactions <ChevronRight className="w-3 md:w-4 h-3 md:h-4" />
               </button>
@@ -526,7 +531,7 @@ export default function Dashboard() {
             <div className="lg:col-span-2 space-y-4 md:space-y-6">
               {/* Welcome Banner for New Users */}
               {isNewUser && (
-                <div className="bg-linear-to-r from-purple-500 to-pink-500 rounded-xl md:rounded-2xl p-4 md:p-6 text-white">
+                <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl md:rounded-2xl p-4 md:p-6 text-white">
                   <div className="flex flex-col sm:flex-row items-center gap-4">
                     <div className="w-12 h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-sm rounded-lg md:rounded-xl flex items-center justify-center">
                       <Sparkles className="w-6 md:w-7 h-6 md:h-7" />
@@ -539,7 +544,7 @@ export default function Dashboard() {
                       <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
                         <button
                           onClick={handleAddMoney}
-                          className="bg-white text-purple-600 px-3 md:px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors text-xs md:text-sm"
+                          className="bg-white text-green-600 px-3 md:px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors text-xs md:text-sm"
                         >
                           Add Money First
                         </button>
@@ -565,7 +570,7 @@ export default function Dashboard() {
                     </div>
                     <button
                       onClick={handleViewWallet}
-                      className="text-purple-600 text-xs md:text-sm font-medium hover:text-purple-700 flex items-center gap-1"
+                      className="text-green-600 text-xs md:text-sm font-medium hover:text-green-700 flex items-center gap-1"
                     >
                       View All <ChevronRight className="w-3 md:w-4 h-3 md:h-4" />
                     </button>
@@ -583,7 +588,7 @@ export default function Dashboard() {
                           <div className="flex items-center gap-3 md:gap-4">
                             <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center ${
                               transaction.status === 'failed' ? 'bg-red-50' :
-                              transaction.amount > 0 ? 'bg-green-50' : 'bg-purple-50'
+                              transaction.amount > 0 ? 'bg-green-50' : 'bg-emerald-50'
                             }`}>
                               {getTransactionIcon(transaction)}
                             </div>
@@ -637,7 +642,7 @@ export default function Dashboard() {
                       </p>
                       <button
                         onClick={handleAddMoney}
-                        className="inline-flex items-center gap-2 px-3 md:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-xs md:text-sm"
+                        className="inline-flex items-center gap-2 px-3 md:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs md:text-sm"
                       >
                         <Plus className="w-4 h-4" />
                         Make your first transaction
@@ -658,28 +663,28 @@ export default function Dashboard() {
                     label="Add Money"
                     icon={<Plus className="w-4 md:w-5 h-4 md:h-5" />}
                     onClick={handleAddMoney}
-                    color="purple"
+                    color="green"
                     description="Top up wallet"
                   />
                   <ActionCard
                     label="Send Gift"
                     icon={<Gift className="w-4 md:w-5 h-4 md:h-5" />}
                     onClick={handleBrowseGifts}
-                    color="pink"
+                    color="emerald"
                     description="Browse gifts"
                   />
                   <ActionCard
                     label="Schedule"
                     icon={<Calendar className="w-4 md:w-5 h-4 md:h-5" />}
                     onClick={handleViewScheduled}
-                    color="blue"
+                    color="teal"
                     description="Plan delivery"
                   />
                   <ActionCard
                     label="Wallet"
                     icon={<Wallet className="w-4 md:w-5 h-4 md:h-5" />}
                     onClick={handleViewWallet}
-                    color="green"
+                    color="lime"
                     description="View details"
                   />
                 </div>
@@ -695,7 +700,7 @@ export default function Dashboard() {
                     </div>
                     <button
                       onClick={handleViewScheduled}
-                      className="text-purple-600 text-xs md:text-sm font-medium hover:text-purple-700"
+                      className="text-green-600 text-xs md:text-sm font-medium hover:text-green-700"
                     >
                       View All
                     </button>
@@ -711,8 +716,8 @@ export default function Dashboard() {
                           className="flex items-center justify-between p-3 md:p-4 hover:bg-gray-50 rounded-lg md:rounded-xl transition-colors cursor-pointer"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                              <Gift className="w-3 md:w-4 h-3 md:h-4 text-purple-600" />
+                            <div className="w-8 h-8 md:w-10 md:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                              <Gift className="w-3 md:w-4 h-3 md:h-4 text-green-600" />
                             </div>
                             <div className="min-w-0">
                               <p className="font-medium text-gray-800 text-sm md:text-base truncate">{gift.person || "Recipient"}</p>
@@ -747,7 +752,7 @@ export default function Dashboard() {
 
               {/* Quick Stats */}
               {balance > 0 && (
-                <div className="bg-linear-to-br from-purple-600 to-purple-800 rounded-xl md:rounded-2xl p-4 md:p-6 text-white">
+                <div className="bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl md:rounded-2xl p-4 md:p-6 text-white">
                   <h3 className="font-semibold mb-3 md:mb-4 text-base md:text-lg">Your Stats</h3>
                   <div className="space-y-3 md:space-y-4">
                     <div className="flex justify-between items-center">
@@ -776,7 +781,7 @@ export default function Dashboard() {
 
           {/* Empty State for New Users */}
           {balance === 0 && !isNewUser && (
-            <div className="mt-6 md:mt-8 bg-linear-to-r from-purple-50 to-pink-50 border border-purple-100 rounded-xl md:rounded-2xl p-4 md:p-6">
+            <div className="mt-6 md:mt-8 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-xl md:rounded-2xl p-4 md:p-6">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="text-center md:text-left">
                   <h3 className="font-semibold text-gray-800 text-base md:text-lg">Ready to start gifting?</h3>
@@ -785,7 +790,7 @@ export default function Dashboard() {
                 <div className="flex gap-2 md:gap-3">
                   <button
                     onClick={() => router.push('/GiftsPage')}
-                    className="bg-white text-purple-600 border border-purple-200 px-3 md:px-5 py-2 rounded-lg font-medium hover:bg-purple-50 transition-colors text-xs md:text-sm"
+                    className="bg-white text-green-600 border border-green-200 px-3 md:px-5 py-2 rounded-lg font-medium hover:bg-green-50 transition-colors text-xs md:text-sm"
                   >
                     Browse Gifts
                   </button>
@@ -802,7 +807,7 @@ export default function Dashboard() {
               <button
                 key={item.id}
                 onClick={() => router.push(item.href)}
-                className="flex flex-col items-center text-xs text-gray-500 hover:text-purple-600 transition-colors"
+                className="flex flex-col items-center text-xs text-gray-500 hover:text-green-600 transition-colors"
               >
                 <item.icon size={20} />
                 <p className="mt-1">{item.label}</p>

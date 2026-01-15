@@ -65,7 +65,7 @@ useEffect(() => {
       case 'scheduled':
         return <Clock className="w-4 h-4 text-blue-500" />;
       case 'delivered':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="w-4 h-4 text-[#1EB53A]" />;
       case 'processing':
         return <Clock className="w-4 h-4 text-yellow-500" />;
       case 'cancelled':
@@ -96,9 +96,9 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1EB53A] mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading your scheduled gifts...</p>
         </div>
       </div>
@@ -107,14 +107,14 @@ useEffect(() => {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md p-6 bg-white rounded-2xl shadow-sm">
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center max-w-md p-6 bg-white rounded-2xl shadow-sm border border-gray-200">
           <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-800 mb-2">Sign in Required</h3>
           <p className="text-gray-600 mb-4">Please sign in to view your scheduled gifts</p>
           <button
             onClick={() => router.push('/api/auth/signin')}
-            className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            className="px-6 py-3 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors"
           >
             Sign In
           </button>
@@ -124,12 +124,12 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-white p-6">
        {/* Back Button */}
               <div className="mb-4">
                 <button
                     onClick={() => router.push("/")}
-                  className="flex items-center gap-2 text-purple-600 font-medium hover:text-purple-800 transition-colors"
+                  className="flex items-center gap-2 text-[#1EB53A] font-medium hover:text-[#189531] transition-colors"
           >
                 <ArrowLeft className="w-5 h-5" />
           Back to Home
@@ -146,7 +146,7 @@ useEffect(() => {
           </div>
           <button 
             onClick={() => router.push('/giftsPage')}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors self-start"
+            className="flex items-center gap-2 px-4 py-2 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors self-start"
           >
             <Plus className="w-4 h-4" />
             Schedule New Gift
@@ -154,13 +154,13 @@ useEffect(() => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-2xl p-1 shadow-sm mb-6 inline-flex">
+        <div className="bg-white rounded-2xl p-1 shadow-sm border border-gray-200 mb-6 inline-flex">
           <button
             onClick={() => setActiveTab("upcoming")}
             className={`px-6 py-3 rounded-lg font-medium transition-colors ${
               activeTab === "upcoming"
-                ? 'bg-purple-600 text-white'
-                : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-[#1EB53A] text-white'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
             }`}
           >
             Upcoming ({scheduledGifts.length})
@@ -169,8 +169,8 @@ useEffect(() => {
             onClick={() => setActiveTab("past")}
             className={`px-6 py-3 rounded-lg font-medium transition-colors ${
               activeTab === "past"
-                ? 'bg-purple-600 text-white'
-                : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-[#1EB53A] text-white'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
             }`}
           >
             Past Deliveries ({pastGifts.length})
@@ -180,10 +180,12 @@ useEffect(() => {
         {/* Gift Schedule */}
         <div className="space-y-4">
           {displayGifts.map((gift) => (
-            <div key={gift._id} className="bg-white rounded-2xl p-6 shadow-sm">
+            <div key={gift._id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:border-gray-300 transition-colors">
               <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
                 <div className="flex items-start gap-4 flex-1">
-                  <div className="text-3xl">{gift.cartItems[0]?.name?.charAt(0) || "🎁"}</div>
+                  <div className="w-12 h-12 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center text-2xl">
+                    {gift.cartItems[0]?.name?.charAt(0) || "🎁"}
+                  </div>
                   
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-2">
@@ -192,7 +194,7 @@ useEffect(() => {
                       </h3>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         gift.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
-                        gift.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                        gift.status === 'delivered' ? 'bg-[#1EB53A]/10 text-[#1EB53A]' :
                         gift.status === 'cancelled' ? 'bg-red-100 text-red-800' :
                         'bg-yellow-100 text-yellow-800'
                       }`}>
@@ -255,7 +257,7 @@ useEffect(() => {
                 </div>
 
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-purple-600">₦{gift.totalAmount?.toLocaleString() || '0'}</p>
+                  <p className="text-2xl font-bold text-[#1EB53A]">₦{gift.totalAmount?.toLocaleString() || '0'}</p>
                   <p className="text-sm text-gray-500 mt-1">
                     {gift.cartItems?.length || 0} items
                   </p>
@@ -276,8 +278,10 @@ useEffect(() => {
         </div>
 
         {displayGifts.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
-            <Gift className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-200">
+            <div className="w-16 h-16 bg-[#1EB53A]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Gift className="w-8 h-8 text-[#1EB53A]" />
+            </div>
             <h3 className="text-lg font-semibold text-gray-600 mb-2">
               No {activeTab === "upcoming" ? "upcoming" : "past"} gifts
             </h3>
@@ -290,7 +294,7 @@ useEffect(() => {
             {activeTab === "upcoming" && (
               <button
                 onClick={() => router.push('/giftsPage')}
-                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="px-6 py-2 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors"
               >
                 Schedule Your First Gift
               </button>
