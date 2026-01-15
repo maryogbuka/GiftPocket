@@ -1,7 +1,7 @@
 // app/api/notifications/[id]/read/route.js
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import { connectDB } from "@/lib/mongodb";
 import InAppNotification from "@/models/InAppNotification";
 

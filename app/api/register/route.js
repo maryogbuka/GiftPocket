@@ -6,7 +6,7 @@ import User from "@/models/User";
 import Wallet from "@/models/Wallet";
 import { generateVirtualAccount } from "@/lib/bank-integration";
 import { encrypt } from "@/lib/encryption";
-import { sendWelcomeEmail } from "@/lib/email-service";
+import { sendWelcomeEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request) {

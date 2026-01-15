@@ -3,20 +3,23 @@
 A gift management and scheduling platform that helps users never miss important occasions.
 
 ## Features
-- Schedule gifts for future dates
-- Digital wallet with balance management
-- Virtual account generation for bank transfers
-- Payment processing via Flutterwave
-- Gift calendar to track upcoming occasions
 
-## Tech Stack
-- Next.js 14
-- MongoDB
-- Tailwind CSS
-- Flutterwave API
+Schedule gifts for future dates
+Digital wallet with balance management
+Virtual account generation for bank transfers
+Payment processing via Flutterwave
+Gift calendar to track upcoming occasions
+
+## TechStack
+
+Next.js 14
+MongoDB
+Tailwind CSS
+Flutterwave API
 
 ## Getting Started
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Set up environment variables
-4. Run development server: `npm run dev`
+
+Clone the repository
+Install dependencies: `npm install`
+Set up environment variables
+Run development server: `npm run dev`

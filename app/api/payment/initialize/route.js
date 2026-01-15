@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import flutterwaveService from '@/services/flutterwave';
+import { authOptions } from "@/lib/auth-options";
+import flutterwaveService from "@/lib/flutterwave";
 
 export async function POST(request) {
   try {

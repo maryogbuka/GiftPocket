@@ -42,8 +42,10 @@ import {
   Target,
   Award,
   Wallet,
+  Camera,
+  Check,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, color } from "framer-motion";
 
 // Mock gifts data
 const nigerianGifts = [
@@ -2072,18 +2074,20 @@ const nigerianGifts = [
 
   ];
 
-const categories = [
-  { id: "all", name: "All Gifts", icon: Gift, color: "bg-purple-600" },
-  { id: "food", name: "Food", icon: Cake, color: "bg-orange-500" },
-  { id: "fashion", name: "Fashion", icon: Shirt, color: "bg-blue-500" },
-  { id: "tech", name: "Tech", icon: Smartphone, color: "bg-green-500" },
-  { id: "home", name: "Home", icon: Home, color: "bg-amber-500" },
-  { id: "experiences", name: "Experiences", icon: Sparkles, color: "bg-pink-500" },
-  { id: "cash", name: "Cash Gifts", icon: Wallet, color: "bg-lime-500" },
-  { id: "beauty", name: "Beauty", icon: Sparkles, color: "bg-violet-500" },
-  { id: "kids", name: "Kids", icon: Users, color: "bg-sky-500" },
-  { id: "corporate", name: "Corporate", icon: Award, color: "bg-gray-500" },
 
+
+// Updated categories with green color scheme
+const categories = [
+  { id: "all", name: "All Gifts", icon: Gift, color: "bg-green-600" },
+  { id: "food", name: "Food", icon: Cake, color: "bg-emerald-600" },
+  { id: "fashion", name: "Fashion", icon: Shirt, color: "bg-green-500" },
+  { id: "tech", name: "Tech", icon: Smartphone, color: "bg-lime-600" },
+  { id: "home", name: "Home", icon: Home, color: "bg-teal-600" },
+  { id: "experiences", name: "Experiences", icon: Sparkles, color: "bg-green-400" },
+  { id: "cash", name: "Cash Gifts", icon: Wallet, color: "bg-emerald-500" },
+  { id: "beauty", name: "Beauty", icon: Sparkles, color: "bg-green-300" },
+  { id: "kids", name: "Kids", icon: Users, color: "bg-emerald-400" },
+  { id: "corporate", name: "Corporate", icon: Award, color: "bg-green-700" },
 ];
 
 // Sort options (same as before)
@@ -2096,11 +2100,13 @@ const sortOptions = [
   { id: "discount", label: "Best Discount" },
 ];
 
-// Custom toast system (simplified - same as before)
+// Custom toast system
 const showToast = (message, type = 'success') => {
+  // Implementation would be same as before
+  console.log(`${type}: ${message}`);
 };
 
-// Gift Card Component - Updated with solid colors
+// Gift Card Component - Updated with green colors
 const GiftCard = ({ 
   gift, 
   index, 
@@ -2125,11 +2131,11 @@ const GiftCard = ({
       >
         <div className="flex gap-4">
           <div className="relative w-32 h-32 shrink-0">
-            <div className="w-full h-full bg-purple-50 rounded-xl flex items-center justify-center">
-              <Gift className="w-8 h-8 text-purple-600" />
+            <div className="w-full h-full bg-green-50 rounded-xl flex items-center justify-center">
+              <Gift className="w-8 h-8 text-green-600" />
             </div>
             {gift.popular && (
-              <div className="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+              <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
                 🔥 POPULAR
               </div>
             )}
@@ -2144,7 +2150,7 @@ const GiftCard = ({
               <div className="flex flex-col items-end gap-1">
                 {discountedPrice ? (
                   <>
-                    <span className="text-xl font-bold text-purple-600">
+                    <span className="text-xl font-bold text-green-600">
                       ₦{discountedPrice.toLocaleString()}
                     </span>
                     <span className="text-sm text-gray-400 line-through">
@@ -2155,7 +2161,7 @@ const GiftCard = ({
                     </span>
                   </>
                 ) : (
-                  <span className="text-xl font-bold text-purple-600">
+                  <span className="text-xl font-bold text-green-600">
                     ₦{gift.price.toLocaleString()}
                   </span>
                 )}
@@ -2186,18 +2192,18 @@ const GiftCard = ({
               {gift.tags?.slice(0, 3).map(tag => (
                 <span
                   key={tag}
-                  className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+                  className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full"
                 >
                   {tag}
                 </span>
               ))}
               {gift.localMade && (
-                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">
                   🇳🇬 Local
                 </span>
               )}
               {gift.ecoFriendly && (
-                <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">
+                <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">
                   🌿 Eco
                 </span>
               )}
@@ -2206,7 +2212,7 @@ const GiftCard = ({
             <div className="flex gap-2">
               <button
                 onClick={() => onAddToCart(gift)}
-                className="flex-1 bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 hover:shadow-lg transition-all"
+                className="flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 hover:shadow-lg transition-all"
               >
                 Add to Cart
               </button>
@@ -2215,14 +2221,14 @@ const GiftCard = ({
                 className={`p-3 rounded-xl border ${
                   isInWishlist
                     ? 'bg-pink-50 border-pink-200 text-pink-600'
-                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                    : 'bg-green-50 border-green-200 text-green-600 hover:bg-green-100'
                 }`}
               >
                 <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
               </button>
               <button
                 onClick={() => onQuickView(gift)}
-                className="p-3 bg-gray-50 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-100"
+                className="p-3 bg-green-50 border border-green-200 text-green-600 rounded-xl hover:bg-green-100"
               >
                 <Eye className="w-5 h-5" />
               </button>
@@ -2233,7 +2239,7 @@ const GiftCard = ({
     );
   }
 
-  // Grid view
+  // Grid view - Updated with green colors
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -2243,7 +2249,7 @@ const GiftCard = ({
     >
       {/* Image/Header */}
       <div className="relative h-48 overflow-hidden">
-        <div className="absolute inset-0 bg-purple-50"></div>
+        <div className="absolute inset-0 bg-green-50"></div>
         {gift.featured && (
           <div className="absolute top-3 left-3 bg-yellow-400 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
             ⭐ FEATURED
@@ -2259,12 +2265,12 @@ const GiftCard = ({
           className={`absolute top-12 right-3 p-2 rounded-full shadow-lg transition-all ${
             isInWishlist
               ? 'bg-pink-600 text-white'
-              : 'bg-white text-gray-600 hover:bg-pink-50'
+              : 'bg-white text-green-600 hover:bg-green-50'
           }`}
         >
           <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
         </button>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-black/20 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-green-900/20 to-transparent"></div>
       </div>
 
       {/* Content */}
@@ -2275,7 +2281,7 @@ const GiftCard = ({
           </h3>
           {discountedPrice ? (
             <div className="text-right">
-              <div className="text-xl font-bold text-purple-600">
+              <div className="text-xl font-bold text-green-600">
                 ₦{discountedPrice.toLocaleString()}
               </div>
               <div className="text-sm text-gray-400 line-through">
@@ -2283,7 +2289,7 @@ const GiftCard = ({
               </div>
             </div>
           ) : (
-            <div className="text-xl font-bold text-purple-600">
+            <div className="text-xl font-bold text-green-600">
               {gift.price > 0 ? `₦${gift.price.toLocaleString()}` : 'Custom Amount'}
             </div>
           )}
@@ -2309,13 +2315,13 @@ const GiftCard = ({
           {gift.tags?.slice(0, 2).map(tag => (
             <span
               key={tag}
-              className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+              className="px-2.5 py-1 bg-green-50 text-green-700 text-xs rounded-full"
             >
               {tag}
             </span>
           ))}
           {gift.localMade && (
-            <span className="px-2.5 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+            <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">
               🇳🇬 Local
             </span>
           )}
@@ -2326,17 +2332,17 @@ const GiftCard = ({
           )}
         </div>
 
-        {/* Actions - Updated with eye icon only */}
+        {/* Actions */}
         <div className="flex gap-2">
           <button
             onClick={() => onAddToCart(gift)}
-            className="flex-1 bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 hover:shadow-lg transition-all hover:scale-[1.02]"
+            className="flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 hover:shadow-lg transition-all hover:scale-[1.02]"
           >
             Add to Cart
           </button>
           <button
             onClick={() => onQuickView(gift)}
-            className="p-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center"
+            className="p-3 bg-green-100 text-green-700 rounded-xl hover:bg-green-200 transition-colors flex items-center justify-center"
             title="Quick View"
           >
             <Eye className="w-5 h-5" />
@@ -2347,7 +2353,7 @@ const GiftCard = ({
   );
 };
 
-// Enhanced Cart Sidebar - Updated with solid colors
+// Enhanced Cart Sidebar - Updated with green colors and media capture
 const EnhancedCartSidebar = ({ 
   cart = [], 
   setCart, 
@@ -2357,6 +2363,8 @@ const EnhancedCartSidebar = ({
   recommendedGifts = [],
   onAddRecommendation 
 }) => {
+  const [includeMediaCapture, setIncludeMediaCapture] = useState(false);
+  
   const updateQuantity = (id, quantity) => {
     const safeQuantity = Math.max(0, quantity);
 
@@ -2391,10 +2399,14 @@ const EnhancedCartSidebar = ({
     showToast(`Gift wrap applied: ${wrapType}`, 'success');
   };
 
-  // Calculate costs
-  const premiumWrapCost = cart.filter(item => item.wrapType === 'premium').length * 500;
+  // Calculate costs - Updated prices
+  const standardWrapCost = cart.filter(item => item.wrapType === 'standard').length * 2000;
+  const premiumWrapCost = cart.filter(item => item.wrapType === 'premium').length * 5000;
+  const mediaCaptureCost = includeMediaCapture ? 10000 : 0;
   const deliveryCost = cart.length > 0 ? 1500 : 0;
-  const totalCost = cartTotal + premiumWrapCost + deliveryCost;
+  
+  const totalWrapCost = standardWrapCost + premiumWrapCost;
+  const totalCost = cartTotal + totalWrapCost + mediaCaptureCost + deliveryCost;
 
   return (
     <motion.div
@@ -2421,7 +2433,7 @@ const EnhancedCartSidebar = ({
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-xl"
+              className="p-2 hover:bg-green-50 rounded-xl text-green-600"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -2429,14 +2441,14 @@ const EnhancedCartSidebar = ({
 
           {cart.length === 0 ? (
             <div className="text-center py-12">
-              <ShoppingCart className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+              <ShoppingCart className="w-20 h-20 text-green-300 mx-auto mb-6" />
               <h3 className="text-xl font-semibold text-gray-700 mb-2">
                 Your cart is empty
               </h3>
               <p className="text-gray-500 mb-6">Add some thoughtful gifts!</p>
               <button
                 onClick={onClose}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 hover:shadow-lg transition-all"
+                className="px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 hover:shadow-lg transition-all"
               >
                 Continue Shopping
               </button>
@@ -2450,17 +2462,19 @@ const EnhancedCartSidebar = ({
                     ? item.price * (1 - item.discount / 100)
                     : item.price;
                   const itemTotal = price * item.quantity;
+                  const wrapCost = item.wrapType === 'standard' ? 2000 : 
+                                  item.wrapType === 'premium' ? 5000 : 0;
 
                   return (
                     <motion.div
                       key={item.id}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="bg-gray-50 rounded-xl p-4 border border-gray-200"
+                      className="bg-green-50 rounded-xl p-4 border border-green-200"
                     >
                       <div className="flex gap-4">
-                        <div className="w-16 h-16 bg-purple-50 rounded-lg flex items-center justify-center shrink-0">
-                          <Gift className="w-6 h-6 text-purple-600" />
+                        <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
+                          <Gift className="w-6 h-6 text-green-600" />
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between mb-2">
@@ -2469,50 +2483,53 @@ const EnhancedCartSidebar = ({
                             </h4>
                             <button
                               onClick={() => updateQuantity(item.id, 0)}
-                              className="text-gray-400 hover:text-red-500"
+                              className="text-green-400 hover:text-red-500"
                             >
                               <X className="w-4 h-4" />
                             </button>
                           </div>
                           
-                          <div className="flex items-center justify-between">
-                            <div className="text-purple-600 font-bold">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="text-green-600 font-bold">
                               ₦{itemTotal.toLocaleString()}
                             </div>
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                                className="w-7 h-7 bg-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-300"
+                                className="w-7 h-7 bg-green-200 rounded-lg flex items-center justify-center hover:bg-green-300 text-green-700"
                               >
                                 <Minus className="w-3 h-3" />
                               </button>
-                              <span className="font-medium w-8 text-center">
+                              <span className="font-medium w-8 text-center text-green-700">
                                 {item.quantity}
                               </span>
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="w-7 h-7 bg-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-300"
+                                className="w-7 h-7 bg-green-200 rounded-lg flex items-center justify-center hover:bg-green-300 text-green-700"
                               >
                                 <Plus className="w-3 h-3" />
                               </button>
                             </div>
                           </div>
 
-                          {/* Gift wrap options */}
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                            <p className="text-sm text-gray-600 mb-2">Gift Wrap:</p>
+                          {/* Gift wrap options - Updated prices */}
+                          <div className="mt-3 pt-3 border-t border-green-200">
+                            <p className="text-sm text-green-700 mb-2">Gift Wrap:</p>
                             <div className="flex gap-2">
-                              {['standard', 'premium'].map(type => (
+                              {[
+                                { type: 'standard', label: 'Standard (+₦2,000)' },
+                                { type: 'premium', label: 'Premium (+₦5,000)' }
+                              ].map(({ type, label }) => (
                                 <button
                                   key={type}
                                   onClick={() => applyGiftWrap(item.id, type)}
-                                  className={`px-3 py-1.5 text-sm rounded-lg ${
+                                  className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                                     item.wrapType === type
-                                      ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                      ? 'bg-green-100 text-green-700 border-2 border-green-300 font-medium'
+                                      : 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200'
                                   }`}
                                 >
-                                  {type === 'standard' ? 'Standard' : 'Premium (+₦500)'}
+                                  {label}
                                 </button>
                               ))}
                             </div>
@@ -2524,25 +2541,69 @@ const EnhancedCartSidebar = ({
                 })}
               </div>
 
+              {/* Media Capture Option */}
+              <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-start gap-3">
+                    <Camera className="w-5 h-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-blue-800">Media Capture Service</h4>
+                      <p className="text-sm text-blue-600">Capture recipient&apos;s reaction to your gift</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-blue-700">₦10,000</p>
+                    <p className="text-xs text-blue-500">One-time fee</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-3">
+                  <div className="text-sm text-blue-600">
+                    <p className="font-medium">What&apos;s included:</p>
+                    <ul className="list-disc list-inside text-xs mt-1 space-y-1">
+                      <li>Professional photo/video of gift unboxing</li>
+                      <li>Edited highlight reel (up to 2 minutes)</li>
+                      <li>Digital delivery within 24 hours</li>
+                    </ul>
+                  </div>
+                  <button
+                    onClick={() => setIncludeMediaCapture(!includeMediaCapture)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      includeMediaCapture
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50'
+                    }`}
+                  >
+                    {includeMediaCapture ? (
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4" />
+                        Added
+                      </div>
+                    ) : (
+                      'Add Service'
+                    )}
+                  </button>
+                </div>
+              </div>
+
               {/* Recommendations */}
               {recommendedGifts.length > 0 && (
                 <div className="mb-6">
-                  <h4 className="font-semibold text-gray-800 mb-3">Add these too:</h4>
+                  <h4 className="font-semibold text-green-800 mb-3">Add these too:</h4>
                   <div className="space-y-2">
                     {recommendedGifts.map(gift => (
                       <div
                         key={gift.id}
-                        className="flex items-center justify-between p-3 bg-purple-50 rounded-xl border border-purple-100"
+                        className="flex items-center justify-between p-3 bg-green-50 rounded-xl border border-green-100"
                       >
                         <div>
                           <p className="font-medium text-gray-800">{gift.name}</p>
-                          <p className="text-sm text-purple-600 font-bold">
+                          <p className="text-sm text-green-600 font-bold">
                             ₦{gift.price.toLocaleString()}
                           </p>
                         </div>
                         <button
                           onClick={() => onAddRecommendation(gift)}
-                          className="px-4 py-2 bg-white border border-purple-300 text-purple-600 rounded-lg font-medium hover:bg-purple-50"
+                          className="px-4 py-2 bg-white border border-green-300 text-green-600 rounded-lg font-medium hover:bg-green-50"
                         >
                           Add
                         </button>
@@ -2553,26 +2614,33 @@ const EnhancedCartSidebar = ({
               )}
 
               {/* Summary */}
-              <div className="border-t border-gray-200 pt-6">
+              <div className="border-t border-green-200 pt-6">
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">₦{cartTotal.toLocaleString()}</span>
+                    <span className="font-medium text-gray-600">₦{cartTotal.toLocaleString()}</span>
                   </div>
 
                   <div className="flex justify-between">
                     <span className="text-gray-600">Gift Wrap</span>
-                    <span className="font-medium">₦{premiumWrapCost.toLocaleString()}</span>
+                    <span className="font-medium text-gray-600">₦{totalWrapCost.toLocaleString()}</span>
                   </div>
+
+                  {includeMediaCapture && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Media Capture</span>
+                      <span className="font-medium text-gray-600">₦10,000</span>
+                    </div>
+                  )}
 
                   <div className="flex justify-between">
                     <span className="text-gray-600">Delivery</span>
-                    <span className="font-medium">₦{deliveryCost.toLocaleString()}</span>
+                    <span className="font-medium text-gray-600">₦{deliveryCost.toLocaleString()}</span>
                   </div>
 
-                  <div className="flex justify-between text-lg font-bold">
+                  <div className="flex justify-between text-gray-600 text-lg font-bold pt-3 border-t border-green-200">
                     <span>Total</span>
-                    <span className="text-purple-600">₦{totalCost.toLocaleString()}</span>
+                    <span className="text-green-600">₦{totalCost.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -2581,15 +2649,15 @@ const EnhancedCartSidebar = ({
                     onClick={() => {
                       onClose();
                       onSchedule();
-                        }}
-                    className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold 
-                    text-lg hover:bg-purple-700 hover:shadow-xl transition-all hover:scale-[1.02]"
-                            >
-                         Schedule Delivery
-                    </button>
+                    }}
+                    className="w-full bg-green-600 text-white py-4 rounded-xl font-bold 
+                    text-lg hover:bg-green-700 hover:shadow-xl transition-all hover:scale-[1.02]"
+                  >
+                    Schedule Delivery
+                  </button>
                   <button
                     onClick={onClose}
-                    className="w-full py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+                    className="w-full py-3 border-2 border-green-300 text-green-700 rounded-xl font-semibold hover:bg-green-50 transition-colors"
                   >
                     Continue Shopping
                   </button>
@@ -2603,7 +2671,7 @@ const EnhancedCartSidebar = ({
   );
 };
 
-// Quick View Modal Component - Updated with solid colors
+// Quick View Modal Component - Updated with green colors
 const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWishlist }) => {
   const isInWishlist = wishlist.includes(gift.id);
   const discountedPrice = gift.discount 
@@ -2624,18 +2692,18 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-         className="bg-white rounded-2xl w-full max-w-2xl overflow-auto max-h-[90vh]"
-          onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-2xl w-full max-w-2xl overflow-auto max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-2xl font-bold text-gray-800">{gift.name}</h2>
-              <p className="text-gray-600">{gift.category}</p>
+              <p className="text-green-600">{gift.category}</p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 text-gray-700 rounded-xl"
+              className="p-2 hover:bg-green-50 text-green-600 rounded-xl"
             >
               <X className="w-5 h-5" />
             </button>
@@ -2644,26 +2712,26 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column - Image & Stats */}
             <div>
-              <div className="h-64 bg-purple-50 rounded-2xl mb-4 flex items-center justify-center">
-                <Gift className="w-16 h-16 text-purple-600" />
+              <div className="h-64 bg-green-50 rounded-2xl mb-4 flex items-center justify-center">
+                <Gift className="w-16 h-16 text-green-600" />
               </div>
               
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-3 bg-gray-50 rounded-xl">
-                  <Clock className="w-5 h-5 text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">Delivery</p>
-                  <p className="font-semibold text-gray-600">{gift.delivery}</p>
+                <div className="text-center p-3 bg-green-50 rounded-xl">
+                  <Clock className="w-5 h-5 text-green-600 mx-auto mb-2" />
+                  <p className="text-sm text-green-500">Delivery</p>
+                  <p className="font-semibold text-green-600">{gift.delivery}</p>
                 </div>
-                <div className="text-center p-3 bg-gray-50 rounded-xl">
+                <div className="text-center p-3 bg-green-50 rounded-xl">
                   <Star className="w-5 h-5 text-yellow-400 fill-current mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">Rating</p>
-                  <p className="font-semibold text-gray-600">{gift.rating} ({gift.reviews})</p>
+                  <p className="text-sm text-green-500">Rating</p>
+                  <p className="font-semibold text-green-600">{gift.rating} ({gift.reviews})</p>
                 </div>
-                <div className="text-center p-3 bg-gray-50 rounded-xl">
-                  <Package className="w-5 h-5 text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">Stock</p>
-                  <p className={`font-semibold text-gray-600 ${gift.stock && gift.stock < 5 ? 'text-red-600' : ''}`}>
-                    {gift.stock || 'Available' }
+                <div className="text-center p-3 bg-green-50 rounded-xl">
+                  <Package className="w-5 h-5 text-green-600 mx-auto mb-2" />
+                  <p className="text-sm text-green-500">Stock</p>
+                  <p className={`font-semibold ${gift.stock && gift.stock < 5 ? 'text-red-600' : 'text-green-600'}`}>
+                    {gift.stock || 'Available'}
                   </p>
                 </div>
               </div>
@@ -2672,18 +2740,18 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
                 {gift.tags?.map(tag => (
                   <span
                     key={tag}
-                    className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm"
+                    className="px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm"
                   >
                     {tag}
                   </span>
                 ))}
                 {gift.localMade && (
-                  <span className="px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm">
+                  <span className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm">
                     🇳🇬 Local Product
                   </span>
                 )}
                 {gift.ecoFriendly && (
-                  <span className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm">
+                  <span className="px-3 py-1.5 bg-teal-100 text-teal-700 rounded-full text-sm">
                     🌿 Eco-Friendly
                   </span>
                 )}
@@ -2701,7 +2769,7 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
               <div className="mb-6">
                 {discountedPrice ? (
                   <div className="space-y-1">
-                    <div className="text-3xl font-bold text-purple-600">
+                    <div className="text-3xl font-bold text-green-600">
                       ₦{discountedPrice.toLocaleString()}
                     </div>
                     <div className="flex items-center gap-3">
@@ -2714,7 +2782,7 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
                     </div>
                   </div>
                 ) : (
-                  <div className="text-3xl font-bold text-purple-600">
+                  <div className="text-3xl font-bold text-green-600">
                     ₦{gift.price.toLocaleString()}
                   </div>
                 )}
@@ -2727,7 +2795,7 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
                     onAddToCart(gift);
                     onClose();
                   }}
-                  className="w-full  bg-purple-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-purple-700 hover:shadow-xl transition-all"
+                  className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 hover:shadow-xl transition-all"
                 >
                   Add to Cart
                 </button>
@@ -2735,10 +2803,10 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
                 <div className="flex gap-3">
                   <button
                     onClick={() => onToggleWishlist(gift.id)}
-                    className={`flex-1 py-3 rounded-xl border ${
+                    className={`flex-1 py-3 rounded-xl border transition-all ${
                       isInWishlist
                         ? 'bg-pink-50 border-pink-200 text-pink-600'
-                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                        : 'bg-green-50 border-green-200 text-green-600 hover:bg-green-100'
                     } font-semibold`}
                   >
                     <div className="flex items-center justify-center gap-2">
@@ -2746,7 +2814,7 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
                       {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
                     </div>
                   </button>
-                  <button className="flex-1 py-3 bg-gray-50 border border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-100">
+                  <button className="flex-1 py-3 bg-green-50 border border-green-200 text-green-600 rounded-xl font-semibold hover:bg-green-100 transition-all">
                     <div className="flex items-center justify-center gap-2">
                       <Share2 className="w-5 h-5" />
                       Share
@@ -2762,12 +2830,12 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
   );
 };
 
-// Main Component - Updated with solid colors
+// Main Component - Updated with green colors
 export default function GiftsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  // State (same as before)
+  // State
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cart, setCart] = useState([]);
@@ -2782,6 +2850,7 @@ export default function GiftsPage() {
   const [showBudgetInput, setShowBudgetInput] = useState(false);
   const [quickViewGift, setQuickViewGift] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [includeMediaCapture, setIncludeMediaCapture] = useState(false);
 
   // All unique tags from gifts
   const allTags = useMemo(() => {
@@ -2801,7 +2870,18 @@ export default function GiftsPage() {
     }, 0);
   }, [cart]);
 
-  // Enhanced filter logic (same as before)
+  // Calculate gift wrap and media capture costs
+  const giftWrapCost = useMemo(() => {
+    return cart.reduce((total, item) => {
+      if (item.wrapType === 'standard') return total + 2000;
+      if (item.wrapType === 'premium') return total + 5000;
+      return total;
+    }, 0);
+  }, [cart]);
+
+  const mediaCaptureCost = includeMediaCapture ? 10000 : 0;
+
+  // Enhanced filter logic
   const filteredGifts = useMemo(() => {
     let filtered = nigerianGifts.filter(gift => {
       const matchesSearch = searchTerm === "" || 
@@ -2868,7 +2948,7 @@ export default function GiftsPage() {
       .slice(0, 4);
   }, [cart]);
 
-  // Handlers (same as before)
+  // Handlers
   const handleAddToCart = (gift) => {
     setCart(prev => {
       const existing = prev.find(item => item.id === gift.id);
@@ -2889,27 +2969,20 @@ export default function GiftsPage() {
     setQuickViewGift(gift);
   };
 
- // Update the handleScheduleGift function
-const handleScheduleGift = () => {
-  if (cart.length === 0) {
-    showToast("Add items to cart first!", 'error');
-    return;
-  }
-  setShowScheduleModal(true);
-  setShowCart(false); // Close cart sidebar
-};
+  const handleScheduleGift = () => {
+    if (cart.length === 0) {
+      showToast("Add items to cart first!", 'error');
+      return;
+    }
+    setShowScheduleModal(true);
+    setShowCart(false);
+  };
 
-// Add this function to handle successful scheduling
-const handleScheduleSuccess = (trackingNumber) => {
-  // Clear cart after successful scheduling
-  setCart([]);
-  showToast(`Gift scheduled successfully! Tracking: ${trackingNumber}`, 'success');
-};
-
-// Calculate gift wrap cost for the modal
-const giftWrapCost = useMemo(() => {
-  return cart.filter(item => item.wrapType === 'premium').length * 500;
-}, [cart]);
+  const handleScheduleSuccess = (trackingNumber) => {
+    setCart([]);
+    setIncludeMediaCapture(false);
+    showToast(`Gift scheduled successfully! Tracking: ${trackingNumber}`, 'success');
+  };
 
   // Effects
   useEffect(() => {
@@ -2918,10 +2991,10 @@ const giftWrapCost = useMemo(() => {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-green-50 to-emerald-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-gray-600 font-medium">Loading gifts...</p>
+          <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-green-600 font-medium">Loading gifts...</p>
         </div>
       </div>
     );
@@ -2931,7 +3004,7 @@ const giftWrapCost = useMemo(() => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-linear-to-br from-green-50 via-emerald-50 to-teal-50">
         {/* Enhanced Header */}
         <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2941,20 +3014,20 @@ const giftWrapCost = useMemo(() => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => router.back()}
-                  className="p-2 hover:bg-purple-50 rounded-xl transition-colors"
+                  className="p-2 hover:bg-green-50 rounded-xl transition-colors"
                 >
-                  <ArrowLeft className="w-5 h-5 text-purple-600" />
+                  <ArrowLeft className="w-5 h-5 text-green-600" />
                 </motion.button>
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-linear-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
                       <Gift className="w-6 h-6 text-white" />
                     </div>
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white"></div>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-purple-600">
-                      Naija Gifts
+                    <h1 className="text-xl font-bold bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                      GiftPocket Gifts
                     </h1>
                     <p className="text-xs text-gray-500">Thoughtful gifts, delivered with love</p>
                   </div>
@@ -2966,7 +3039,7 @@ const giftWrapCost = useMemo(() => {
                 <div className="hidden md:flex items-center gap-2">
                   <button
                     onClick={() => setShowBudgetInput(!showBudgetInput)}
-                    className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-xl text-amber-700 hover:shadow-sm transition-all"
+                    className="flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-700 hover:shadow-sm transition-all"
                   >
                     <Wallet className="w-4 h-4" />
                     <span className="font-medium">Budget</span>
@@ -2982,14 +3055,14 @@ const giftWrapCost = useMemo(() => {
                         placeholder="₦ Max"
                         value={budget || ''}
                         onChange={(e) => setBudget(e.target.value ? Number(e.target.value) : null)}
-                        className="w-32 px-3 py-2 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                        className="w-32 px-3 py-2 border text-gray-800 border-yellow-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                       />
                       {budget && (
                         <button
                           onClick={() => setBudget(null)}
-                          className="p-1 hover:bg-amber-100 rounded-lg"
+                          className="p-1 hover:bg-yellow-100 rounded-lg"
                         >
-                          <X className="w-4 h-4 text-amber-600" />
+                          <X className="w-4 h-4 text-yellow-600" />
                         </button>
                       )}
                     </motion.div>
@@ -2997,10 +3070,10 @@ const giftWrapCost = useMemo(() => {
                 </div>
 
                 {/* View Toggle */}
-                <div className="hidden md:flex items-center bg-gray-100 p-1 rounded-xl">
+                <div className="hidden md:flex items-center bg-green-100 p-1 rounded-xl">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-white shadow' : ''}`}
+                    className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-green-600 text-white shadow' : 'text-green-600 hover:bg-green-200'}`}
                   >
                     <div className="w-4 h-4">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -3013,7 +3086,7 @@ const giftWrapCost = useMemo(() => {
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-white shadow' : ''}`}
+                    className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-green-600 text-white shadow' : 'text-green-600 hover:bg-green-200'}`}
                   >
                     <div className="w-4 h-4">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -3033,19 +3106,19 @@ const giftWrapCost = useMemo(() => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowCart(true)}
-                  className="relative p-3 bg-purple-50 rounded-xl hover:shadow-md transition-all"
+                  className="relative p-3 bg-green-50 rounded-xl hover:shadow-md transition-all"
                 >
-                  <ShoppingCart className="w-5 h-5 text-purple-600" />
+                  <ShoppingCart className="w-5 h-5 text-green-600" />
                   {cart.length > 0 && (
                     <>
                       <motion.span
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+                        className="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
                       >
                         {cart.reduce((sum, item) => sum + item.quantity, 0)}
                       </motion.span>
-                      <div className="absolute -bottom-1 inset-x-0 h-1 bg-purple-600 rounded-full"></div>
+                      <div className="absolute -bottom-1 inset-x-0 h-1 bg-green-600 rounded-full"></div>
                     </>
                   )}
                 </motion.button>
@@ -3055,13 +3128,13 @@ const giftWrapCost = useMemo(() => {
         </header>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Hero Section */}
+          {/* Hero Section - Updated with green colors */}
           <div className="mb-8">
-            <div className="bg-purple-600 rounded-2xl p-8 text-white overflow-hidden relative">
+            <div className="bg-linear-to-r from-green-500 to-emerald-600 rounded-2xl p-8 text-white overflow-hidden relative">
               <div className="absolute inset-0 bg-black/10"></div>
               <div className="relative z-10 max-w-2xl">
                 <h2 className="text-3xl font-bold mb-4">Find the Perfect Nigerian Gift 🎁</h2>
-                <p className="text-purple-100 mb-6">
+                <p className="text-green-100 mb-6">
                   From spicy suya to beautiful Ankara, discover thoughtful gifts that celebrate Nigerian culture.
                   Perfect for birthdays, weddings, and special occasions.
                 </p>
@@ -3092,7 +3165,7 @@ const giftWrapCost = useMemo(() => {
             <div className="lg:w-64 shrink-0">
               <div className="bg-white rounded-2xl shadow-sm border p-6 sticky top-24">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-bold text-gray-800 flex items-center gap-2">
+                  <h3 className="font-bold text-green-800 flex items-center gap-2">
                     <Filter className="w-4 h-4" />
                     Filters
                   </h3>
@@ -3104,7 +3177,7 @@ const giftWrapCost = useMemo(() => {
                       setSelectedTags([]);
                       setBudget(null);
                     }}
-                    className="text-sm text-purple-600 hover:text-purple-700"
+                    className="text-sm text-green-600 hover:text-green-700"
                   >
                     Clear all
                   </button>
@@ -3112,7 +3185,7 @@ const giftWrapCost = useMemo(() => {
 
                 {/* Price Range */}
                 <div className="mb-6">
-                  <h4 className="font-semibold text-gray-700 mb-3">Price Range</h4>
+                  <h4 className="font-semibold text-green-700 mb-3">Price Range</h4>
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -3123,9 +3196,9 @@ const giftWrapCost = useMemo(() => {
                           setSelectedPriceRange("all");
                           setPriceRange([0, 1000000]);
                         }}
-                        className="text-purple-600 focus:ring-purple-500"
+                        className="text-green-600 focus:ring-green-500"
                       />
-                      <span className="text-sm text-gray-600">All Prices</span>
+                      <span className="text-sm text-green-600">All Prices</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -3136,9 +3209,9 @@ const giftWrapCost = useMemo(() => {
                           setSelectedPriceRange("Under ₦5,000");
                           setPriceRange([0, 5000]);
                         }}
-                        className="text-purple-600 focus:ring-purple-500"
+                        className="text-green-600 focus:ring-green-500"
                       />
-                      <span className="text-sm text-gray-600">Under ₦5,000</span>
+                      <span className="text-sm text-green-600">Under ₦5,000</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -3149,9 +3222,9 @@ const giftWrapCost = useMemo(() => {
                           setSelectedPriceRange("₦5,000 - ₦15,000");
                           setPriceRange([5000, 15000]);
                         }}
-                        className="text-purple-600 focus:ring-purple-500"
+                        className="text-green-600 focus:ring-green-500"
                       />
-                      <span className="text-sm text-gray-600">₦5,000 - ₦15,000</span>
+                      <span className="text-sm text-green-600">₦5,000 - ₦15,000</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -3162,16 +3235,16 @@ const giftWrapCost = useMemo(() => {
                           setSelectedPriceRange("₦15,000 - ₦30,000");
                           setPriceRange([15000, 30000]);
                         }}
-                        className="text-purple-600 focus:ring-purple-500"
+                        className="text-green-600 focus:ring-green-500"
                       />
-                      <span className="text-sm text-gray-600">₦15,000 - ₦30,000</span>
+                      <span className="text-sm text-green-600">₦15,000 - ₦30,000</span>
                     </label>
                   </div>
                 </div>
 
                 {/* Tags Filter */}
                 <div className="mb-6">
-                  <h4 className="font-semibold text-gray-700 mb-3">Tags</h4>
+                  <h4 className="font-semibold text-green-700 mb-3">Tags</h4>
                   <div className="flex flex-wrap gap-2">
                     {allTags.slice(0, 10).map(tag => (
                       <button
@@ -3185,8 +3258,8 @@ const giftWrapCost = useMemo(() => {
                         }}
                         className={`px-3 py-1.5 rounded-full text-sm transition-all ${
                           selectedTags.includes(tag)
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-green-50 text-green-600 hover:bg-green-100'
                         }`}
                       >
                         {tag}
@@ -3208,9 +3281,9 @@ const giftWrapCost = useMemo(() => {
                           setSelectedTags(prev => prev.filter(t => !['local', 'handmade'].includes(t)));
                         }
                       }}
-                      className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                      className="rounded border-green-300 text-green-600 focus:ring-green-500"
                     />
-                    <span className="text-sm text-gray-600">Local & Handmade</span>
+                    <span className="text-sm text-green-600">Local & Handmade</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -3223,9 +3296,9 @@ const giftWrapCost = useMemo(() => {
                           setSelectedTags(prev => prev.filter(t => !['eco', 'sustainable'].includes(t)));
                         }
                       }}
-                      className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                      className="rounded border-green-300 text-green-600 focus:ring-green-500"
                     />
-                    <span className="text-sm text-gray-600">Eco-friendly</span>
+                    <span className="text-sm text-green-600">Eco-friendly</span>
                   </label>
                 </div>
               </div>
@@ -3237,20 +3310,20 @@ const giftWrapCost = useMemo(() => {
               <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
                 <div className="flex flex-col lg:flex-row gap-4">
                   <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-400 w-5 h-5" />
                     <input
                       type="text"
                       placeholder="Search gifts by name, category, or tag..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full text-gray-700 pl-12 pr-4 py-3 bg-green-50 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
                   <div className="flex items-center gap-3">
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none pr-10"
+                      className="bg-green-50 text-green-700 border border-green-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none pr-10"
                     >
                       {sortOptions.map(option => (
                         <option key={option.id} value={option.id}>
@@ -3258,11 +3331,11 @@ const giftWrapCost = useMemo(() => {
                         </option>
                       ))}
                     </select>
-                    <ChevronDown className="w-4 h-4 text-gray-400 -ml-8 pointer-events-none" />
+                    <ChevronDown className="w-4 h-4 text-green-400 -ml-8 pointer-events-none" />
                   </div>
                 </div>
 
-                {/* Category Chips */}
+                {/* Category Chips - Updated with green colors */}
                 <div className="flex flex-wrap gap-2 mt-6">
                   {categories.map(category => {
                     const Icon = category.icon;
@@ -3273,7 +3346,7 @@ const giftWrapCost = useMemo(() => {
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
                           selectedCategory === category.id
                             ? `${category.color} text-white shadow-md`
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            : 'bg-green-50 text-green-600 hover:bg-green-100'
                         }`}
                       >
                         <Icon className="w-4 h-4" />
@@ -3281,7 +3354,7 @@ const giftWrapCost = useMemo(() => {
                         <span className={`text-xs px-1.5 py-0.5 rounded-full ${
                           selectedCategory === category.id
                             ? 'bg-white/20'
-                            : 'bg-gray-200'
+                            : 'bg-green-200'
                         }`}>
                           {nigerianGifts.filter(g => 
                             category.id === 'all' || g.category === category.id
@@ -3293,27 +3366,27 @@ const giftWrapCost = useMemo(() => {
                 </div>
               </div>
 
-              {/* Stats Bar */}
+              {/* Stats Bar - Updated with green colors */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-4 rounded-2xl border shadow-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                      <Package className="w-5 h-5 text-purple-600" />
+                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                      <Package className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Total Gifts</p>
-                      <p className="text-xl font-bold text-gray-800">{filteredGifts.length}</p>
+                      <p className="text-sm text-green-500">Total Gifts</p>
+                      <p className="text-xl font-bold text-green-800">{filteredGifts.length}</p>
                     </div>
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-2xl border shadow-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-green-600" />
+                    <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Popular Today</p>
-                      <p className="text-xl font-bold text-gray-800">
+                      <p className="text-sm text-emerald-500">Popular Today</p>
+                      <p className="text-xl font-bold text-emerald-800">
                         {filteredGifts.filter(g => g.popular).length}
                       </p>
                     </div>
@@ -3321,23 +3394,23 @@ const giftWrapCost = useMemo(() => {
                 </div>
                 <div className="bg-white p-4 rounded-2xl border shadow-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                      <Zap className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-teal-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Fast Delivery</p>
-                      <p className="text-xl font-bold text-gray-800">Same Day</p>
+                      <p className="text-sm text-teal-500">Fast Delivery</p>
+                      <p className="text-xl font-bold text-teal-800">Same schedule Day</p>
                     </div>
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-2xl border shadow-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                      <Crown className="w-5 h-5 text-amber-600" />
+                    <div className="w-10 h-10 bg-lime-100 rounded-xl flex items-center justify-center">
+                      <Crown className="w-5 h-5 text-lime-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Top Rated</p>
-                      <p className="text-xl font-bold text-gray-800">
+                      <p className="text-sm text-lime-500">Top Rated</p>
+                      <p className="text-xl font-bold text-lime-800">
                         {filteredGifts.filter(g => g.rating >= 4.5).length}
                       </p>
                     </div>
@@ -3348,9 +3421,9 @@ const giftWrapCost = useMemo(() => {
               {/* Gifts Grid/List */}
               {filteredGifts.length === 0 ? (
                 <div className="bg-white rounded-2xl border p-12 text-center">
-                  <Gift className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-700 mb-2">No gifts found</h3>
-                  <p className="text-gray-500 mb-6">Try adjusting your filters or search term</p>
+                  <Gift className="w-16 h-16 text-green-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-green-700 mb-2">No gifts found</h3>
+                  <p className="text-green-500 mb-6">Try adjusting your filters or search term</p>
                   <button
                     onClick={() => {
                       setSearchTerm('');
@@ -3358,7 +3431,7 @@ const giftWrapCost = useMemo(() => {
                       setSelectedTags([]);
                       setBudget(null);
                     }}
-                    className="px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 hover:shadow-lg transition-all"
+                    className="px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 hover:shadow-lg transition-all"
                   >
                     Reset Filters
                   </button>
@@ -3396,10 +3469,10 @@ const giftWrapCost = useMemo(() => {
                   {recommendedGifts.length > 0 && (
                     <div className="mt-12">
                       <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-bold text-gray-800">
+                        <h3 className="text-xl font-bold text-green-800">
                           Recommended for you
                         </h3>
-                        <div className="flex items-center gap-2 text-purple-600">
+                        <div className="flex items-center gap-2 text-green-600">
                           <Target className="w-4 h-4" />
                           <span className="text-sm font-medium">Based on your cart</span>
                         </div>
@@ -3412,21 +3485,21 @@ const giftWrapCost = useMemo(() => {
                             className="bg-white rounded-xl border p-4 hover:shadow-md transition-all"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-                                <Gift className="w-5 h-5 text-purple-600" />
+                              <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                                <Gift className="w-5 h-5 text-green-600" />
                               </div>
                               <div>
-                                <h4 className="font-semibold text-gray-800 line-clamp-1">
+                                <h4 className="font-semibold text-green-800 line-clamp-1">
                                   {gift.name}
                                 </h4>
-                                <p className="text-sm text-purple-600 font-bold">
+                                <p className="text-sm text-green-600 font-bold">
                                   ₦{gift.price.toLocaleString()}
                                 </p>
                               </div>
                             </div>
                             <button
                               onClick={() => handleAddToCart(gift)}
-                              className="w-full mt-3 py-2 bg-purple-50 text-purple-600 rounded-lg font-medium hover:bg-purple-100 transition-colors"
+                              className="w-full mt-3 py-2 bg-green-50 text-green-600 rounded-lg font-medium hover:bg-green-100 transition-colors"
                             >
                               Add to Cart
                             </button>
@@ -3475,14 +3548,20 @@ const giftWrapCost = useMemo(() => {
           )}
         </AnimatePresence>
 
-        <GiftSchedulingModal
-          isOpen={showScheduleModal}
-          onClose={() => setShowScheduleModal(false)}
-          onSuccess={handleScheduleSuccess}
-          cartItems={cart}
-          cartTotal={cartTotal}
-          giftWrapCost={giftWrapCost}
-        />
+        {/* Gift Scheduling Modal */}
+        <AnimatePresence>
+          {showScheduleModal && (
+            <GiftSchedulingModal
+              isOpen={showScheduleModal}
+              onClose={() => setShowScheduleModal(false)}
+              onSuccess={handleScheduleSuccess}
+              cartItems={cart}
+              cartTotal={cartTotal}
+              giftWrapCost={giftWrapCost}
+              mediaCaptureCost={includeMediaCapture ? 10000 : 0}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </>
   );

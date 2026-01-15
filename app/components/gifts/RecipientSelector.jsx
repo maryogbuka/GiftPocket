@@ -483,7 +483,7 @@ export default function RecipientSelector({
       </button>
 
       {/* Recipients List */}
-      <div className="space-y-3 max-h-[400px] overflow-y-auto">
+      <div className="space-y-3 max-h-100 overflow-y-auto">
         {filteredRecipients.length === 0 ? (
           <div className="text-center py-8">
             <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />

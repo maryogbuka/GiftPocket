@@ -4,7 +4,7 @@ import Transaction from "@/models/Transaction";
 import Wallet from "@/models/Wallet";
 import User from "@/models/User";
 import { flw } from "@/lib/flutterwave";
-import { sendNotification } from "@/lib/notification-service";
+import sendNotification from "@/lib/notification-service";
 
 // Maximum verification attempts
 const MAX_VERIFICATION_ATTEMPTS = 3;

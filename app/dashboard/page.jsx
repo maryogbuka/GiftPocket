@@ -360,7 +360,7 @@ export default function Dashboard() {
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full text-gray-800 pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -783,12 +783,6 @@ export default function Dashboard() {
                   <p className="text-gray-600 text-xs md:text-sm mt-1">Add money to your wallet to send your first gift!</p>
                 </div>
                 <div className="flex gap-2 md:gap-3">
-                  <button
-                    onClick={handleAddMoney}
-                    className="bg-purple-600 text-white px-3 md:px-5 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors text-xs md:text-sm"
-                  >
-                    Add Money Now
-                  </button>
                   <button
                     onClick={() => router.push('/GiftsPage')}
                     className="bg-white text-purple-600 border border-purple-200 px-3 md:px-5 py-2 rounded-lg font-medium hover:bg-purple-50 transition-colors text-xs md:text-sm"

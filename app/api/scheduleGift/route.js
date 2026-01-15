@@ -4,7 +4,7 @@
 
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { addScheduledGift, getScheduledGiftsByEmail } from '@/app/lib/scheduledGifts';
+import { addScheduledGift, getScheduledGiftsByEmail } from '@/lib/scheduledGifts';
 
 
 const resend = new Resend(process.env.RESEND_API_KEY);
