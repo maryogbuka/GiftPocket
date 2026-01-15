@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]  // This makes @ point to ./app directory
+    }
+  },
+  "include": ["app/**/*", "lib", "models"],
+  "exclude": ["node_modules"]
+}
