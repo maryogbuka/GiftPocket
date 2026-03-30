@@ -1,249 +1,255 @@
 // components/NotificationBell.jsx
 "use client";
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Bell, Check, X, ExternalLink } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Bell, Check, X, ExternalLink, Loader2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export default function NotificationBell() {
   const { data: session } = useSession();
-  const [notifications, setNotifications] = useState([]);
+
+  const [notifs, setNotifs] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const dropdownRef = useRef(null);
 
-  // Fetch notifications
-  const fetchNotifications = useCallback(async () => {
-    if (!session?.user) return;
-    
+  /**
+   * Fetch notifications for the logged-in user
+   */
+  const getUserNotifications = useCallback(async () => {
+    if (!session?.user?.id) return;
+
     setLoading(true);
+
     try {
-      const response = await fetch('/api/notifications');
-      const data = await response.json();
-      
-      if (data.success) {
-        setNotifications(data.data.notifications);
-        setUnreadCount(data.data.unreadCount);
+      const res = await fetch("/api/notifications");
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+
+      if (data?.notifications) {
+        setNotifs(data.notifications);
+        setUnreadCount(data.unreadCount || 0);
       }
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+    } catch (err) {
+      console.error("Failed to get notifications:", err);
     } finally {
       setLoading(false);
     }
-  }, [session?.user]);
+  }, [session?.user?.id]);
 
-  // Poll for new notifications every 30 seconds
+  /**
+   * Initial load + polling
+   */
   useEffect(() => {
-    if (!session?.user) return;
-    
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
-    
+    if (!session?.user?.id) return;
+
+    getUserNotifications();
+
+    const interval = setInterval(getUserNotifications, 60000); // every 1 min
+
     return () => clearInterval(interval);
-  }, [session?.user, fetchNotifications]);
+  }, [session?.user?.id, getUserNotifications]);
 
-  // Close dropdown when clicking outside
+  /**
+   * Close dropdown when clicking outside
+   */
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setIsOpen(false);
       }
-    }
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  // Mark notification as read
-  const markAsRead = async (notificationId) => {
+  /**
+   * Mark one notification as read
+   */
+  const markAsRead = async (id) => {
     try {
-      await fetch(`/api/notifications/${notificationId}/read`, {
-        method: 'POST'
-      });
-      
-      // Update local state
-      setNotifications(prev => 
-        prev.map(notif => 
-          notif._id === notificationId 
-            ? { ...notif, isRead: true }
-            : notif
-        )
+      await fetch(`/api/notifications/${id}/read`, { method: "POST" });
+
+      setNotifs((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
       );
-      setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error('Failed to mark as read:', error);
+
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error("Could not mark as read:", err);
     }
   };
 
-  // Mark all as read
-  const markAllAsRead = async () => {
+  /**
+   * Mark all as read
+   */
+  const markAllRead = async () => {
+    if (unreadCount === 0) return;
+
     try {
-      await fetch('/api/notifications/read-all', {
-        method: 'POST'
-      });
-      
-      setNotifications(prev => 
-        prev.map(notif => ({ ...notif, isRead: true }))
-      );
+      await fetch("/api/notifications/read-all", { method: "POST" });
+
+      setNotifs((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setUnreadCount(0);
-    } catch (error) {
-      console.error('Failed to mark all as read:', error);
+    } catch (err) {
+      console.error("Could not mark all read:", err);
     }
   };
 
-  // Format time
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
+  /**
+   * Friendly time formatter
+   */
+  const getTimeDisplay = (dateStr) => {
+    if (!dateStr) return "";
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString();
+    const date = new Date(dateStr);
+    const diffMins = Math.floor((Date.now() - date.getTime()) / 60000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m`;
+
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h`;
+
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) return `${diffDays}d`;
+
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
 
-  // Get notification icon
-  const getNotificationIcon = (type) => {
-    switch(type) {
-      case 'order_confirmation':
-        return '🎁';
-      case 'delivery_completed':
-        return '✅';
-      case 'media_available':
-        return '📸';
-      case 'week_before_delivery':
-      case 'three_days_before':
-      case 'day_before':
-      case 'delivery_day':
-        return '⏰';
-      default:
-        return '💬';
-    }
+  const getIcon = (type) => {
+    const icons = {
+      gift: "🎁",
+      delivery: "🚚",
+      message: "💬",
+      reminder: "⏰",
+      payment: "💰",
+      system: "⚙️",
+    };
+    return icons[type] || "📢";
   };
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Notification Bell */}
+      {/* Bell */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        onClick={() => setIsOpen((v) => !v)}
+        className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5 text-gray-600" />
+        <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+            {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-xl shadow-lg border border-gray-200 z-50 max-h-125 overflow-hidden flex flex-col">
+        <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 flex flex-col max-h-96">
           {/* Header */}
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-800">Notifications</h3>
-              <div className="flex items-center gap-2">
-                {unreadCount > 0 && (
-                  <button
-                    onClick={markAllAsRead}
-                    className="text-xs text-purple-600 hover:text-purple-700 font-medium"
-                  >
-                    Mark all as read
-                  </button>
-                )}
+          <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between">
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white">
+                Notifications
+              </h3>
+              {unreadCount > 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {unreadCount} unread
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {unreadCount > 0 && (
                 <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1 hover:bg-gray-100 rounded"
+                  onClick={markAllRead}
+                  className="text-xs text-blue-600 dark:text-blue-400"
                 >
-                  <X className="w-4 h-4 text-gray-500" />
+                  Mark all read
                 </button>
-              </div>
+              )}
+              <button onClick={() => setIsOpen(false)}>
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
             </div>
           </div>
 
-          {/* Notifications List */}
+          {/* List */}
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="p-8 text-center">
-                <div className="w-8 h-8 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto"></div>
-                <p className="text-gray-500 mt-2 text-sm">Loading notifications...</p>
+              <div className="py-8 flex flex-col items-center">
+                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                <p className="text-sm text-gray-500 mt-2">Loading…</p>
               </div>
-            ) : notifications.length === 0 ? (
-              <div className="p-8 text-center">
-                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Bell className="w-6 h-6 text-gray-400" />
-                </div>
-                <p className="text-gray-600 font-medium">No notifications yet</p>
-                <p className="text-gray-500 text-sm mt-1">You&apos;re all caught up!</p>
+            ) : notifs.length === 0 ? (
+              <div className="py-8 text-center text-gray-500">
+                You’re all caught up ✨
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
-                {notifications.map((notification) => (
-                  <div
-                    key={notification._id}
-                    className={`p-4 hover:bg-gray-50 transition-colors ${!notification.isRead ? 'bg-blue-50' : ''}`}
-                  >
-                    <div className="flex gap-3">
-                      <div className="shrink-0">
-                        <span className="text-lg">{getNotificationIcon(notification.type)}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between mb-1">
-                          <p className="font-medium text-gray-800 text-sm">
-                            {notification.title}
-                          </p>
-                          {!notification.isRead && (
-                            <button
-                              onClick={() => markAsRead(notification._id)}
-                              className="p-1 hover:bg-gray-200 rounded text-gray-500"
-                              title="Mark as read"
-                            >
-                              <Check className="w-3 h-3" />
-                            </button>
-                          )}
-                        </div>
-                        <p className="text-gray-600 text-sm mb-2">
-                          {notification.message}
+              notifs.slice(0, 6).map((n) => (
+                <div
+                  key={n.id}
+                  className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 ${
+                    !n.isRead ? "bg-blue-50/50 dark:bg-blue-900/20" : ""
+                  }`}
+                >
+                  <div className="flex gap-3">
+                    <span className="text-xl">{getIcon(n.type)}</span>
+
+                    <div className="flex-1">
+                      <div className="flex justify-between">
+                        <p className="font-medium text-sm text-gray-900 dark:text-white">
+                          {n.title}
                         </p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">
-                            {formatTime(notification.createdAt)}
-                          </span>
-                          {notification.actionUrl && (
-                            <a
-                              href={notification.actionUrl}
-                              className="text-xs text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1"
-                              onClick={() => markAsRead(notification._id)}
-                            >
-                              View <ExternalLink className="w-3 h-3" />
-                            </a>
-                          )}
-                        </div>
+                        {!n.isRead && (
+                          <button onClick={() => markAsRead(n.id)}>
+                            <Check className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        {n.message}
+                      </p>
+
+                      <div className="flex justify-between mt-1">
+                        <span className="text-xs text-gray-400">
+                          {getTimeDisplay(n.createdAt)}
+                        </span>
+                        {n.link && (
+                          <a
+                            href={n.link}
+                            onClick={() => !n.isRead && markAsRead(n.id)}
+                            className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1"
+                          >
+                            View <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))
             )}
           </div>
 
           {/* Footer */}
-          <div className="p-3 border-t border-gray-200">
+          {notifs.length > 0 && (
             <a
-              href="/dashboard/notifications"
-              className="block text-center text-sm text-purple-600 hover:text-purple-700 font-medium py-2 hover:bg-purple-50 rounded-lg transition-colors"
+              href="/notifications"
               onClick={() => setIsOpen(false)}
+              className="block text-center py-3 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
-              View all notifications
+              See all notifications
             </a>
-          </div>
+          )}
         </div>
       )}
     </div>

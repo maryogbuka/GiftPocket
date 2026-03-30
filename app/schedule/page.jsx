@@ -1,306 +1,594 @@
-// app/schedule/page.jsx (or wherever this file is located)
-
-
-// This page is the customer dashboard for viewing all the gifts they have scheduled.
+// app/scheduled/page.jsx
 "use client";
-import { useState, useEffect } from "react";
-import { Calendar, ArrowLeft, Plus, Clock, Gift, User, CheckCircle, XCircle } from "lucide-react";
+
+import toast from "react-hot-toast";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { 
+  Calendar, Clock, MapPin, Gift, Package, Truck, 
+  CheckCircle, AlertCircle, Search, Filter, ArrowLeft,
+  ChevronRight, Eye, Download, RefreshCw, MoreVertical,
+  CalendarDays, TrendingUp, PackageOpen, Clock3,
+  Plus, Bell, Settings, Menu, X, BarChart3,
+  Wallet as WalletIcon, Sparkles, Zap
+} from "lucide-react";
+import { useSettings } from "@/app/context/SettingsContext";
 
+
+
+
+function getThemeClasses(settings) {
+  const isDark = settings.appearance.theme === 'dark';
+  
+  return {
+    bg: {
+      primary: isDark ? "bg-gray-900" : "bg-gray-50",
+      secondary: isDark ? "bg-gray-800" : "bg-white",
+      card: isDark ? "bg-gray-800" : "bg-white",
+      overlay: isDark ? "bg-black/50" : "bg-black/50",
+      sidebar: isDark ? "bg-gray-800" : "bg-white",
+      header: isDark ? "bg-gray-800" : "bg-white",
+      nav: isDark ? "bg-gray-800" : "bg-white",
+      green: isDark ? "bg-[#1EB53A]/10" : "bg-[#1EB53A]/10",
+      gray: isDark ? "bg-gray-700" : "bg-gray-50",
+      hover: isDark ? "bg-gray-700" : "bg-gray-50",
+    },
+    text: {
+      primary: isDark ? "text-white" : "text-gray-800",
+      secondary: isDark ? "text-gray-300" : "text-gray-600",
+      muted: isDark ? "text-gray-400" : "text-gray-500",
+      green: "text-[#1EB53A]",
+    },
+    border: {
+      primary: isDark ? "border-gray-700" : "border-gray-200",
+      secondary: isDark ? "border-gray-600" : "border-gray-200",
+      green: isDark ? "border-[#1EB53A]/30" : "border-[#1EB53A]/30",
+    },
+    shadow: isDark ? "shadow-lg shadow-black/20" : "shadow-sm",
+    isDark
+  };
+}
 
 export default function SchedulePage() {
-  const [activeTab, setActiveTab] = useState("upcoming");
-  const [scheduledGifts, setScheduledGifts] = useState([]);
-  const [pastGifts, setPastGifts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const { settings } = useSettings();
+  const theme = getThemeClasses(settings);
+  
+  const [gifts, setGifts] = useState([]);
+  const [filteredGifts, setFilteredGifts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const statusOptions = [
+    { id: "all", label: "All Status", color: "gray" },
+    { id: "scheduled", label: "Scheduled", color: "blue" },
+    { id: "processing", label: "Processing", color: "yellow" },
+    { id: "shipped", label: "Shipped", color: "orange" },
+    { id: "delivered", label: "Delivered", color: "green" },
+    { id: "cancelled", label: "Cancelled", color: "red" }
+  ];
 
-useEffect(() => {
-  if (!session?.user?.email) {
-    setLoading(false);
-    return;
-  }
+  // Navigation items matching dashboard
+  const navItems = [
+    { label: "Dashboard", id: "dashboard", icon: BarChart3, href: "/" },
+    { label: "Gift Store", id: "gifts", icon: Gift, href: "/giftsPage" },
+    { label: "Scheduled", id: "scheduled", icon: Calendar, href: "/schedule" },
+    { label: "Wallet", id: "wallet", icon: WalletIcon, href: "/wallet" },
+    { label: "Me", id: "me", icon: Sparkles, href: "/me" },
+    { label: "Settings", id: "settings", icon: Settings, href: "/settings" },
+  ];
 
-  const fetchGifts = async () => {
-    try {
-      const res = await fetch(`/api/scheduleGift?email=${session.user.email}`);
-      const data = await res.json();
-      console.log("Fetched gifts:", data);
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/login");
+  }, [status, router]);
+
+  useEffect(() => {
+    fetchScheduledGifts();
+  }, []);
+
+  const filterGifts = useCallback(() => {
+    let filtered = [...gifts];
+    
+    if (searchTerm) {
+      filtered = filtered.filter(gift =>
+        gift.recipientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        gift.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        gift.address.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(gift => gift.status === statusFilter);
+    }
+    
+    setFilteredGifts(filtered);
+  }, [searchTerm, statusFilter, gifts]);
+
+  useEffect(() => {
+    filterGifts();
+  }, [filterGifts]);
+
+  // app/scheduled/page.jsx - Update fetchScheduledGifts
+const fetchScheduledGifts = async () => {
+  try {
+    setLoading(true);
+    
+    // Get the user's email from session or context
+    const userEmail = "demo@giftpocket.com"; // Replace with actual user email
+    
+    const response = await fetch(`/api/scheduled-gifts?email=${encodeURIComponent(userEmail)}`);
+    
+    console.log("API Response status:", response.status);
+    
+    if (!response.ok) {
+      // Get more detailed error info
+      const errorText = await response.text();
+      console.error("API Error response:", errorText);
       
-      if (data.success && data.gifts) {
-        // Filter gifts based on status and date
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        const upcoming = data.gifts.filter(gift => {
-          const deliveryDate = new Date(gift.deliveryDate);
-          return gift.status !== 'delivered' && gift.status !== 'cancelled' && deliveryDate >= today;
-        });
-        
-        const past = data.gifts.filter(gift => {
-          const deliveryDate = new Date(gift.deliveryDate);
-          return gift.status === 'delivered' || deliveryDate < today || gift.status === 'cancelled';
-        });
-        
-        setScheduledGifts(upcoming);
-        setPastGifts(past);
+      // Check if it's a 404 (endpoint not found)
+      if (response.status === 404) {
+        toast.error('API endpoint not found. Check if the route exists.');
       } else {
-        console.error("API returned error:", data.message);
+        toast.error(`Failed to fetch gifts: ${response.status} ${response.statusText}`);
       }
-    } catch (err) {
-      console.error("Error fetching gifts:", err);
-    } finally {
-      // ✅ CRITICAL: Always set loading to false when done
-      setLoading(false);
+      throw new Error(`Failed to fetch gifts: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("Gifts data received:", data);
+    
+    if (data.success) {
+      setGifts(data.gifts || []);
+      setFilteredGifts(data.gifts || []);
+    } else {
+      toast.error(data.error || 'Failed to load gifts');
+      setGifts([]);
+      setFilteredGifts([]);
+    }
+    
+  } catch (error) {
+    console.error("Error fetching gifts:", error);
+    // Make sure toast is imported and available
+    if (typeof toast !== 'undefined') {
+      toast.error('Failed to load scheduled gifts');
+    } else {
+      console.error('Toast not available:', error.message);
+    }
+    setGifts([]);
+    setFilteredGifts([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  const getStatusColor = (status) => {
+    switch(status) {
+      case "scheduled": return "bg-blue-100 text-blue-800 border-blue-200";
+      case "processing": return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "shipped": return "bg-orange-100 text-orange-800 border-orange-200";
+      case "delivered": return "bg-green-100 text-green-800 border-green-200";
+      case "cancelled": return "bg-red-100 text-red-800 border-red-200";
+      default: return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
-
-  fetchGifts();
-}, [session]);
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case 'scheduled':
-        return <Clock className="w-4 h-4 text-blue-500" />;
-      case 'delivered':
-        return <CheckCircle className="w-4 h-4 text-[#1EB53A]" />;
-      case 'processing':
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'cancelled':
-        return <XCircle className="w-4 h-4 text-red-500" />;
-      default:
-        return <Clock className="w-4 h-4 text-gray-500" />;
+    switch(status) {
+      case "scheduled": return <Calendar className="w-4 h-4" />;
+      case "processing": return <Package className="w-4 h-4" />;
+      case "shipped": return <Truck className="w-4 h-4" />;
+      case "delivered": return <CheckCircle className="w-4 h-4" />;
+      case "cancelled": return <AlertCircle className="w-4 h-4" />;
+      default: return <Clock3 className="w-4 h-4" />;
     }
   };
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'scheduled':
-        return 'Scheduled for delivery';
-      case 'delivered':
-        return 'Successfully delivered';
-      case 'processing':
-        return 'Being processed';
-      case 'cancelled':
-        return 'Cancelled';
-      case 'shipped':
-        return 'Shipped - In transit';
-      default:
-        return 'Pending confirmation';
-    }
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-NG", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric"
+    });
   };
 
-  const displayGifts = activeTab === "upcoming" ? scheduledGifts : pastGifts;
+  const naira = (amount = 0) => `₦${Number(amount).toLocaleString()}`;
 
-  if (loading) {
+  const handleTrackGift = (trackingNumber) => {
+    router.push(`/GiftStatuaTracker/${trackingNumber}`);
+  };
+
+  const handleReorder = (gift) => {
+    console.log("Reordering gift:", gift);
+    router.push("/giftsPage");
+  };
+
+  if (status === "loading") {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1EB53A] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your scheduled gifts...</p>
-        </div>
+      <div className={`min-h-screen ${theme.bg.primary} flex items-center justify-center`}>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1EB53A]"></div>
       </div>
     );
   }
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center max-w-md p-6 bg-white rounded-2xl shadow-sm border border-gray-200">
-          <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">Sign in Required</h3>
-          <p className="text-gray-600 mb-4">Please sign in to view your scheduled gifts</p>
-          <button
-            onClick={() => router.push('/api/auth/signin')}
-            className="px-6 py-3 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors"
-          >
-            Sign In
-          </button>
-        </div>
-      </div>
-    );
+  
+  if (status === "unauthenticated") {
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-white p-6">
-       {/* Back Button */}
-              <div className="mb-4">
-                <button
-                    onClick={() => router.push("/")}
-                  className="flex items-center gap-2 text-[#1EB53A] font-medium hover:text-[#189531] transition-colors"
-          >
-                <ArrowLeft className="w-5 h-5" />
-          Back to Home
+    <div className={`min-h-screen ${theme.bg.primary}`}>
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 md:hidden" onClick={() => setMobileMenuOpen(false)}>
+          <div className={`fixed inset-y-0 left-0 w-64 ${theme.bg.sidebar} shadow-xl transform transition-transform duration-300 ease-in-out`} onClick={(e) => e.stopPropagation()}>
+            <div className={`p-6 ${theme.border.primary}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-linear-to-br from-[#1EB53A] to-emerald-600 rounded-xl flex items-center justify-center">
+                    <Gift className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h1 className={`text-xl font-bold ${theme.text.primary}`}>GiftPocket</h1>
+                    <p className={`text-xs ${theme.text.muted}`}>Fintech Gifting</p>
+                  </div>
+                </div>
+                <button onClick={() => setMobileMenuOpen(false)} className={`p-2 hover:${theme.bg.gray} rounded-lg`}>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Gift Schedule</h1>
-            <p className="text-gray-600">Manage your scheduled gift deliveries</p>
-            <p className="text-sm text-gray-500 mt-1">
-              Logged in as: {session.user.email}
-            </p>
+            </div>
+            <div className="p-4">
+              <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`w-full pl-10 pr-4 py-2.5 ${theme.bg.gray} ${theme.border.primary} rounded-xl text-sm focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent ${theme.text.primary}`}
+                />
+              </div>
+              <nav className="space-y-1">
+                {navItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      router.push(item.href);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm transition-all duration-200 ${theme.text.secondary} hover:${theme.bg.green} hover:text-[#1EB53A]`}
+                  >
+                    <item.icon className="w-4.5 h-4.5" />
+                    <span className="font-medium">{item.label}</span>
+                  </button>
+                ))}
+              </nav>
+            </div>
           </div>
-          <button 
-            onClick={() => router.push('/giftsPage')}
-            className="flex items-center gap-2 px-4 py-2 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors self-start"
-          >
-            <Plus className="w-4 h-4" />
-            Schedule New Gift
-          </button>
         </div>
+      )}
 
-        {/* Tabs */}
-        <div className="bg-white rounded-2xl p-1 shadow-sm border border-gray-200 mb-6 inline-flex">
-          <button
-            onClick={() => setActiveTab("upcoming")}
-            className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-              activeTab === "upcoming"
-                ? 'bg-[#1EB53A] text-white'
-                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-            }`}
-          >
-            Upcoming ({scheduledGifts.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("past")}
-            className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-              activeTab === "past"
-                ? 'bg-[#1EB53A] text-white'
-                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-            }`}
-          >
-            Past Deliveries ({pastGifts.length})
-          </button>
+      {/* Desktop Sidebar */}
+      <aside className={`hidden md:fixed md:inset-y-0 md:left-0 md:z-50 md:w-64 ${theme.bg.sidebar} ${theme.border.primary} md:shadow-lg md:flex md:flex-col`}>
+        <div className="p-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-linear-to-br from-[#1EB53A] to-emerald-600 rounded-xl flex items-center justify-center">
+              <Gift className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className={`text-xl font-bold ${theme.text.primary}`}>GiftPocket</h1>
+              <p className={`text-xs ${theme.text.muted}`}>Fintech Gifting</p>
+            </div>
+          </div>
         </div>
+        <div className="px-4 mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={`w-full ${theme.text.primary} pl-10 pr-4 py-2.5 ${theme.bg.gray} ${theme.border.primary} rounded-xl text-sm focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent`}
+            />
+          </div>
+        </div>
+        <nav className="flex-1 px-4 space-y-1">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => router.push(item.href)}
+              className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm transition-all duration-200 ${
+                item.id === "scheduled" 
+                  ? `${theme.bg.green} text-[#1EB53A]` 
+                  : `${theme.text.secondary} hover:${theme.bg.green} hover:text-[#1EB53A]`
+              } hover:shadow-sm group`}
+            >
+              <item.icon className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
+              <span className="font-medium">{item.label}</span>
+              <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          ))}
+        </nav>
+      </aside>
 
-        {/* Gift Schedule */}
-        <div className="space-y-4">
-          {displayGifts.map((gift) => (
-            <div key={gift._id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:border-gray-300 transition-colors">
-              <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
-                <div className="flex items-start gap-4 flex-1">
-                  <div className="w-12 h-12 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center text-2xl">
-                    {gift.cartItems[0]?.name?.charAt(0) || "🎁"}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {gift.cartItems?.map(item => item.name).join(', ') || "Gift Package"}
-                      </h3>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        gift.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
-                        gift.status === 'delivered' ? 'bg-[#1EB53A]/10 text-[#1EB53A]' :
-                        gift.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {gift.status}
-                      </span>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">{gift.recipientName}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Gift className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600 capitalize">{gift.relationship}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">
-                          {new Date(gift.deliveryDate).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
-                          {gift.deliveryTime && ` at ${gift.deliveryTime}`}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(gift.status)}
-                        <span className="text-gray-600">{getStatusText(gift.status)}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-600">📞 {gift.recipientPhone}</span>
-                      </div>
-                    </div>
+      {/* Main Content */}
+      <main className="md:ml-64">
+        {/* Top Header */}
+        <header className={`sticky top-0 z-40 ${theme.bg.header} ${theme.border.primary} border-b px-4 py-3 md:px-6 md:py-4`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setMobileMenuOpen(true)}
+                className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <Menu className="w-5 h-5 text-gray-600" />
+              </button>
+              <button
+                onClick={() => router.back()}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
+              </button>
+              <div>
+                <h1 className={`text-lg md:text-xl font-bold ${theme.text.primary}`}>
+                  Scheduled Gifts
+                </h1>
+                <p className={`text-xs md:text-sm ${theme.text.secondary}`}>
+                  Track your upcoming gift deliveries
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 md:gap-3">
+              <button
+                onClick={fetchScheduledGifts}
+                className={`p-2 hover:${theme.bg.gray} rounded-lg md:rounded-xl transition-colors`}
+                disabled={loading}
+              >
+                <RefreshCw className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
+              </button>
+              <button
+                onClick={() => router.push("/giftsPage")}
+                className="px-4 py-2 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors"
+              >
+                <Plus className="w-4 h-4 inline mr-2" />
+                New Gift
+              </button>
+            </div>
+          </div>
+        </header>
 
-                    {gift.personalMessage && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-sm text-gray-600">
-                          <span className="font-medium">Gift Note:</span> {gift.personalMessage}
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="mt-3">
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium">Delivery to:</span> {gift.recipientAddress}, {gift.recipientCity}, {gift.recipientState}
-                      </p>
-                      {gift.trackingNumber && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          <span className="font-medium">Tracking:</span> {gift.trackingNumber}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+        {/* Stats Overview */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className={`${theme.bg.card} p-4 md:p-6 rounded-xl md:rounded-2xl ${theme.shadow} border ${theme.border.primary}`}>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                  <Calendar className="w-5 h-5" />
                 </div>
-
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-[#1EB53A]">₦{gift.totalAmount?.toLocaleString() || '0'}</p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {gift.cartItems?.length || 0} items
+                <div>
+                  <p className={`text-sm ${theme.text.secondary}`}>Scheduled</p>
+                  <p className={`text-xl font-bold ${theme.text.primary}`}>
+                    {gifts.filter(g => g.status === "scheduled").length}
                   </p>
-                  {activeTab === "upcoming" && gift.status === 'scheduled' && (
-                    <div className="flex gap-2 mt-3 justify-end">
-                      <button className="px-3 py-1 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50 transition-colors">
-                        Edit
-                      </button>
-                      <button className="px-3 py-1 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">
-                        Cancel
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-
-        {displayGifts.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-200">
-            <div className="w-16 h-16 bg-[#1EB53A]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Gift className="w-8 h-8 text-[#1EB53A]" />
+            
+            <div className={`${theme.bg.card} p-4 md:p-6 rounded-xl md:rounded-2xl ${theme.shadow} border ${theme.border.primary}`}>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-yellow-100 text-yellow-600 rounded-lg">
+                  <Package className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className={`text-sm ${theme.text.secondary}`}>Processing</p>
+                  <p className={`text-xl font-bold ${theme.text.primary}`}>
+                    {gifts.filter(g => g.status === "processing").length}
+                  </p>
+                </div>
+              </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">
-              No {activeTab === "upcoming" ? "upcoming" : "past"} gifts
-            </h3>
-            <p className="text-gray-500 mb-4">
-              {activeTab === "upcoming" 
-                ? "Schedule your first gift delivery to see it here."
-                : "Your delivered gifts will appear here."
-              }
-            </p>
-            {activeTab === "upcoming" && (
-              <button
-                onClick={() => router.push('/giftsPage')}
-                className="px-6 py-2 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors"
-              >
-                Schedule Your First Gift
-              </button>
+            
+            <div className={`${theme.bg.card} p-4 md:p-6 rounded-xl md:rounded-2xl ${theme.shadow} border ${theme.border.primary}`}>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-100 text-orange-600 rounded-lg">
+                  <Truck className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className={`text-sm ${theme.text.secondary}`}>In Transit</p>
+                  <p className={`text-xl font-bold ${theme.text.primary}`}>
+                    {gifts.filter(g => g.status === "shipped").length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className={`${theme.bg.card} p-4 md:p-6 rounded-xl md:rounded-2xl ${theme.shadow} border ${theme.border.primary}`}>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 text-green-600 rounded-lg">
+                  <CheckCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className={`text-sm ${theme.text.secondary}`}>Delivered</p>
+                  <p className={`text-xl font-bold ${theme.text.primary}`}>
+                    {gifts.filter(g => g.status === "delivered").length}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className={`${theme.bg.card} rounded-xl md:rounded-2xl ${theme.shadow} border ${theme.border.primary} p-4 md:p-6 mb-6`}>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search by recipient name, tracking number, or address..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`w-full pl-10 pr-4 py-3 ${theme.text.primary} ${theme.bg.gray} border ${theme.border.primary} rounded-lg focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent`}
+                />
+              </div>
+              
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {statusOptions.map(option => (
+                  <button
+                    key={option.id}
+                    onClick={() => setStatusFilter(option.id)}
+                    className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                      statusFilter === option.id
+                        ? `bg-[#1EB53A] text-white`
+                        : `${theme.bg.gray} ${theme.text.primary} hover:${theme.bg.hover}`
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Gifts List */}
+          <div className="space-y-4">
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1EB53A] mx-auto"></div>
+                <p className={`mt-4 ${theme.text.secondary}`}>Loading your scheduled gifts...</p>
+              </div>
+            ) : filteredGifts.length === 0 ? (
+              <div className={`${theme.bg.card} rounded-xl md:rounded-2xl ${theme.shadow} border ${theme.border.primary} p-12 text-center`}>
+                <Gift className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className={`text-xl font-bold ${theme.text.primary} mb-2`}>No scheduled gifts found</h3>
+                <p className={`${theme.text.secondary} mb-6`}>
+                  {searchTerm || statusFilter !== "all" 
+                    ? "Try adjusting your filters" 
+                    : "Schedule your first gift to see it here"}
+                </p>
+                <button
+                  onClick={() => router.push("/giftsPage")}
+                  className="px-6 py-3 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors"
+                >
+                  Schedule Your First Gift
+                </button>
+              </div>
+            ) : (
+              filteredGifts.map(gift => (
+                <div key={gift.id} className={`${theme.bg.card} rounded-xl md:rounded-2xl ${theme.shadow} border ${theme.border.primary} overflow-hidden hover:${theme.bg.hover} transition-colors`}>
+                  <div className="p-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-start gap-4">
+                          <div className={`p-3 ${theme.bg.green} rounded-lg`}>
+                            <Gift className="w-6 h-6 text-[#1EB53A]" />
+                          </div>
+                          
+                          <div className="flex-1">
+                            <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2">
+                              <h3 className={`text-lg font-bold ${theme.text.primary}`}>
+                                {gift.recipientName}
+                              </h3>
+                              <div className="flex items-center gap-2">
+                                <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${getStatusColor(gift.status)}`}>
+                                  {getStatusIcon(gift.status)}
+                                  {gift.status.charAt(0).toUpperCase() + gift.status.slice(1)}
+                                </span>
+                                <span className={`text-sm ${theme.text.secondary}`}>
+                                  {gift.occasion.charAt(0).toUpperCase() + gift.occasion.slice(1)}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-gray-400" />
+                                <span className={theme.text.secondary}>
+                                  {formatDate(gift.deliveryDate)} at {gift.deliveryTime}
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <MapPin className="w-4 h-4 text-gray-400" />
+                                <span className={`${theme.text.secondary} truncate`}>{gift.address}</span>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <PackageOpen className="w-4 h-4 text-gray-400" />
+                                <span className={theme.text.secondary}>
+                                  {gift.items.length} item{gift.items.length !== 1 ? "s" : ""}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div className="flex flex-wrap items-center gap-3">
+                              <code className={`px-3 py-1 ${theme.bg.gray} ${theme.text.primary} rounded-lg font-mono text-sm`}>
+                                {gift.trackingNumber}
+                              </code>
+                              <span className={`font-bold ${theme.text.green}`}>
+                                {naira(gift.totalAmount)}
+                              </span>
+                              {gift.daysUntil && gift.status !== "delivered" && (
+                                <span className={`text-sm ${theme.text.secondary}`}>
+                                  Delivery in {gift.daysUntil} day{gift.daysUntil !== 1 ? "s" : ""}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleTrackGift(gift.trackingNumber)}
+                          className="px-4 py-2 bg-[#1EB53A] text-white rounded-lg hover:bg-[#189531] transition-colors flex items-center gap-2"
+                        >
+                          <Eye className="w-4 h-4" />
+                          Track
+                        </button>
+                        
+                        <button
+                          onClick={() => handleReorder(gift)}
+                          className={`px-4 py-2 border ${theme.border.green} ${theme.text.green} rounded-lg hover:${theme.bg.green} transition-colors flex items-center gap-2`}
+                        >
+                          <TrendingUp className="w-4 h-4" />
+                          Reorder
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
             )}
           </div>
-        )}
+        </div>
+
+        {/* Mobile Navigation */}
+        <nav className={`fixed bottom-0 left-0 right-0 ${theme.bg.nav} shadow-lg rounded-t-xl md:hidden ${theme.border.primary} z-40`}>
+          <div className="flex justify-around py-3">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => router.push(item.href)}
+                className={`flex flex-col items-center text-xs ${
+                  item.id === "scheduled" 
+                    ? "text-[#1EB53A]" 
+                    : theme.text.secondary
+                } hover:text-[#1EB53A] transition-colors`}
+              >
+                <item.icon size={20} />
+                <p className="mt-1">{item.label}</p>
+              </button>
+            ))}
+          </div>
+        </nav>
+      </main>
     </div>
   );
 }

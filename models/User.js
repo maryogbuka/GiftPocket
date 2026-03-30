@@ -1,4 +1,4 @@
-// models/User.js - Updated
+// models/User.js - MUST HAVE PHONE FIELD
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
@@ -18,6 +18,16 @@ const UserSchema = new mongoose.Schema({
     match: [/^\S+@\S+\.\S+$/, "Please provide a valid email"],
     index: true
   },
+
+  // ⭐⭐ MUST HAVE PHONE FIELD ⭐⭐
+  phone: {
+    type: String,
+    required: [true, "Please provide a phone number"],
+    unique: true,
+    trim: true,
+    match: [/^[0-9]{11}$/, "Please provide a valid 11-digit Nigerian phone number"],
+    index: true
+  },
   
   password: {
     type: String,
@@ -26,49 +36,14 @@ const UserSchema = new mongoose.Schema({
     minlength: [8, "Password must be at least 8 characters"],
   },
 
-  // Security fields
-  twoFactorEnabled: {
-    type: Boolean,
-    default: false
-  },
-  
-  twoFactorSecret: {
-    type: String,
-    select: false
-  },
-  
-  failedLoginAttempts: {
-    type: Number,
-    default: 0,
-    select: false
-  },
-  
-  accountLockedUntil: {
-    type: Date,
-    select: false
-  },
-  
-  lastLogin: {
-    type: Date,
-    select: false
-  },
-  
-  loginHistory: [{
-    ip: String,
-    userAgent: String,
-    timestamp: Date,
-    success: Boolean
-  }],
-
   // Wallet integration
   walletId: {
     type: String,
     unique: true,
-    sparse: true,
     index: true
   },
   
-  // Virtual account reference (encrypted data stored in Wallet model)
+  // Virtual account reference
   hasVirtualAccount: {
     type: Boolean,
     default: false
@@ -81,18 +56,16 @@ const UserSchema = new mongoose.Schema({
     default: "pending"
   },
   
-  kycVerifiedAt: {
-    type: Date
-  },
-  
-  resetToken: {
+  referralCode: {
     type: String,
-    select: false,
+    uppercase: true,
+    unique: true,
+    sparse: true
   },
   
-  resetTokenExpiry: {
-    type: Number,
-    select: false,
+  referredBy: {
+    type: String,
+    uppercase: true
   },
   
   // Account status
@@ -102,7 +75,7 @@ const UserSchema = new mongoose.Schema({
     default: "active"
   },
   
-  // Audit fields
+  // Timestamps
   createdAt: {
     type: Date,
     default: Date.now,
@@ -111,81 +84,34 @@ const UserSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now,
-  },
-  
-  deletedAt: {
-    type: Date,
-    select: false
   }
 }, {
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
+  timestamps: true
 });
 
-// Virtual for account age
-UserSchema.virtual('accountAge').get(function() {
-  return Math.floor((new Date() - this.createdAt) / (1000 * 60 * 60 * 24));
-});
-
-// Update the updatedAt field on save
-UserSchema.pre("save", function(next) {
-  this.updatedAt = Date.now();
+// Add pre-save middleware for referral code
+UserSchema.pre('save', async function(next) {
+  if (!this.referralCode) {
+    const generateCode = () => {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    };
+    
+    let isUnique = false;
+    while (!isUnique) {
+      const code = generateCode();
+      const existing = await mongoose.models.User.findOne({ referralCode: code });
+      if (!existing) {
+        this.referralCode = code;
+        isUnique = true;
+      }
+    }
+  }
   next();
 });
 
-// Soft delete support
-UserSchema.methods.softDelete = function() {
-  this.deletedAt = new Date();
-  this.status = "deactivated";
-  return this.save();
-};
-
-// Check if account is locked
-UserSchema.methods.isLocked = function() {
-  if (this.accountLockedUntil && new Date() < this.accountLockedUntil) {
-    return true;
-  }
-  return false;
-};
-
-// Reset failed login attempts
-UserSchema.methods.resetFailedLogins = function() {
-  this.failedLoginAttempts = 0;
-  this.accountLockedUntil = null;
-  return this.save();
-};
-
-// Add login attempt
-UserSchema.methods.addLoginAttempt = async function(success, ip, userAgent) {
-  this.loginHistory.push({
-    ip,
-    userAgent,
-    timestamp: new Date(),
-    success
-  });
-  
-  // Keep only last 10 login attempts
-  if (this.loginHistory.length > 10) {
-    this.loginHistory = this.loginHistory.slice(-10);
-  }
-  
-  if (success) {
-    this.failedLoginAttempts = 0;
-    this.accountLockedUntil = null;
-    this.lastLogin = new Date();
-  } else {
-    this.failedLoginAttempts += 1;
-    
-    // Lock account after 5 failed attempts for 15 minutes
-    if (this.failedLoginAttempts >= 5) {
-      this.accountLockedUntil = new Date(Date.now() + 15 * 60 * 1000);
-    }
-  }
-  
-  return this.save();
-};
-
-// If model exists, use it; otherwise create it
-const User = mongoose.models.User || mongoose.model("User", UserSchema);
-export default User;
+export default mongoose.models.User || mongoose.model("User", UserSchema);

@@ -18,15 +18,11 @@ export async function POST(request, { params }) {
     const { id } = params;
     await connectDB();
 
-    // Find and update notification
-    const notification = await InAppNotification.findOneAndUpdate(
-      {
-        _id: id,
-        userId: session.user.id
-      },
-      { isRead: true },
-      { new: true }
-    );
+    // Use the model's instance method
+    const notification = await InAppNotification.findOne({
+      _id: id,
+      userId: session.user.id
+    });
 
     if (!notification) {
       return NextResponse.json(
@@ -34,6 +30,8 @@ export async function POST(request, { params }) {
         { status: 404 }
       );
     }
+
+    await notification.markAsRead();
 
     return NextResponse.json({
       success: true,

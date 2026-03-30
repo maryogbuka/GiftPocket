@@ -1,247 +1,199 @@
 // app/api/scheduleGift/route.js
-// This file is the backend API route in Next.js.
-// It powers the entire “Schedule a Gift” feature in this app.
-
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-import { addScheduledGift, getScheduledGiftsByEmail } from '@/lib/scheduledGifts';
+import { getServerSession } from 'next-auth';
+import { authOptions } from "@/lib/auth-options";
+import { connectDB } from "@/lib/mongodb";  // This is what we actually have
+import ScheduledGift from '@/models/ScheduledGift';
 
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Helper function to format the date nicely
+const formatDateForDisplay = (date) => {
+  if (!date) return 'N/A';
+  return new Date(date).toLocaleDateString('en-NG', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
 
 export async function POST(request) {
+  let giftSaved = false;
+  let giftId = null;
+  
   try {
-    console.log('🎁 Schedule gift API called');
+    console.log('🎁 Someone is trying to schedule a gift...');
     
-    const body = await request.json();
-    console.log('Received data:', body);
-
-    // Ensure customerEmail exists
-    const customerEmail = body.customerEmail || (body.sessionUserEmail ?? null);
-    if (!customerEmail) {
-      return NextResponse.json(
-        { success: false, message: 'Missing required field: customerEmail' },
-        { status: 400 }
-      );
-    }
-
-    const {
-      recipientName,
-      recipientPhone,
-      deliveryDate,
-      deliveryTime,
-      personalMessage,
-      specialInstructions,
-      giftWrap,
-      includeCard,
-      trackingNumber,
-      cartItems = [],
-      totalAmount = 0,
-      recipientAddress,
-      recipientCity,
-      recipientState,
-      relationship
-    } = body;
-
-    // Validate required fields
-    const requiredFields = [
-      'recipientName', 
-      'customerEmail', 
-      'recipientPhone', 
-      'deliveryDate', 
-      'recipientAddress',
-      'recipientCity',
-      'recipientState',
-      'relationship'
-    ];
-    
-    const missingFields = requiredFields.filter(field => !body[field]);
-    if (missingFields.length > 0) {
+    // Check if user is logged in
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
       return NextResponse.json(
         { 
           success: false, 
-          message: `Missing required fields: ${missingFields.join(', ')}`
+          message: 'Hey, you need to be signed in to schedule a gift!'
+        },
+        { status: 401 }
+      );
+    }
+    
+    // Get the data from the request
+    const body = await request.json();
+    
+    // Log what we got (but not the sensitive info)
+    console.log('Got data from:', session.user.email);
+    console.log('Gift details:', {
+      for: body.recipientName,
+      date: body.deliveryDate,
+      items: body.cartItems?.length || 0
+    });
+
+    // Connect to the database - USE THE RIGHT FUNCTION!
+    await connectDB();  // Changed from connectToDatabase()
+    console.log('✅ Database connected');
+
+    // Check if we have everything we need
+    const missingStuff = [];
+    
+    if (!body.recipientName?.trim()) missingStuff.push("recipient's name");
+    if (!body.recipientPhone?.trim()) missingStuff.push("recipient's phone");
+    if (!body.deliveryDate?.trim()) missingStuff.push("delivery date");
+    if (!body.recipientAddress?.trim()) missingStuff.push("delivery address");
+    
+    if (missingStuff.length > 0) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: `Oops! We need a few more details: ${missingStuff.join(', ')}`
         },
         { status: 400 }
       );
     }
 
-    // Save to MongoDB
-    const scheduledGift = await addScheduledGift({
-      customerEmail,
-      recipientName,
-      recipientPhone,
-      deliveryDate,
-      deliveryTime,
-      personalMessage: personalMessage || '',
-      specialInstructions: specialInstructions || '',
-      giftWrap: giftWrap || false,
-      includeCard: includeCard || false,
-      trackingNumber,
-      cartItems,
-      totalAmount,
-      recipientAddress,
-      recipientCity,
-      recipientState,
-      relationship,
-      status: 'scheduled'
+    if (!body.cartItems || body.cartItems.length === 0) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: 'Your cart seems empty. Add some gifts first!'
+        },
+        { status: 400 }
+      );
+    }
+
+    const scheduledGift = await ScheduledGift.create({
+      customerEmail: session.user.email,
+      customerName: session.user.name || 'Gift Giver',
+      recipientName: body.recipientName,
+      recipientPhone: body.recipientPhone,
+      recipientEmail: body.recipientEmail || '',
+      deliveryDate: new Date(body.deliveryDate),
+      deliveryTime: body.deliveryTime || '12:00',
+      personalMessage: body.personalMessage || '',
+      specialInstructions: body.specialInstructions || '',
+      giftWrap: body.giftWrap || false,
+      includeCard: body.includeCard || false,
+      cartItems: body.cartItems || [],
+      totalAmount: body.totalAmount || 0,
+      recipientAddress: body.recipientAddress || '',
+      recipientCity: body.recipientCity || '',
+      recipientState: body.recipientState || '',
+      relationship: body.relationship || 'friend',
+      occasion: body.occasion || 'just because',
+      status: 'scheduled',
+      isSurprise: true,
+      paymentStatus: 'paid'
     });
 
-    console.log('✅ Gift saved to MongoDB:', scheduledGift);
+    giftSaved = true;
+    giftId = scheduledGift._id;
+    
+    console.log('✅ Gift saved! ID:', giftId);
+    console.log('📦 Tracking number:', scheduledGift.trackingNumber);
 
-    let emailsSent = {
-  customer: false, // Email ONLY to you (the scheduler)
-  recipient: false // No emails to recipient - IT'S A SURPRISE!
-};
-
-// Send confirmation email ONLY to CUSTOMER (you - the person scheduling)
-try {
-  await resend.emails.send({
-    from: 'Naija Gifts <mhycienth57@gmail.com>',
-    to: customerEmail, // Only send to you
-    subject: `🎁 Surprise Gift Scheduled Successfully - ${trackingNumber}`,
-    html: generateCustomerConfirmationEmail({
-      trackingNumber,
-      recipientName,
-      deliveryDate,
-      deliveryTime,
-      totalAmount,
-      cartItems,
-      customerEmail,
-      recipientAddress: `${recipientAddress}, ${recipientCity}, ${recipientState}`,
-      personalMessage,
-      specialInstructions
-    })
-  });
-  emailsSent.customer = true;
-  console.log('✅ Surprise gift confirmation sent to customer:', customerEmail);
-} catch (customerError) {
-  console.error('❌ Failed to send customer confirmation email:', customerError);
-}
-
-// NO EMAILS SENT TO RECIPIENT - IT'S A SURPRISE!
-
+    // You could send an email here if you have email setup
+    // But for now, let's just return success
+    
     return NextResponse.json({ 
       success: true,
-      message: 'Gift scheduled and saved to database successfully!',
-      trackingNumber,
-      scheduledGift,
-      emailsSent
+      message: 'Awesome! Your surprise gift is scheduled! 🎉',
+      data: {
+        trackingNumber: scheduledGift.trackingNumber,
+        giftId: giftId,
+        deliveryDate: body.deliveryDate,
+        formattedDeliveryDate: formatDateForDisplay(body.deliveryDate),
+        totalAmount: body.totalAmount || 0,
+        recipientName: body.recipientName
+      }
     });
 
   } catch (error) {
-    console.error('❌ Error in schedule-gift API:', error);
+    console.error('❌ Oh no, something went wrong:', error);
+    
+    // Try to clean up if we saved the gift but something else failed
+    if (giftSaved && giftId) {
+      try {
+        await ScheduledGift.findByIdAndDelete(giftId);
+        console.log('🗑️ Cleaned up gift after error');
+      } catch (cleanupError) {
+        console.error('Could not cleanup:', cleanupError);
+      }
+    }
+    
     return NextResponse.json(
-      { success: false, message: 'Server error: ' + error.message },
+      { 
+        success: false, 
+        message: error.message.includes('duplicate') 
+          ? 'Looks like this gift was already scheduled.'
+          : 'Sorry, something went wrong on our end. Please try again.'
+      },
       { status: 500 }
     );
   }
 }
 
-// Email templates (keep your existing ones)
-function generateCustomerConfirmationEmail(details) {
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #007bff; color: white; padding: 20px; text-align: center; }
-          .content { padding: 20px; background: #f9f9f9; }
-          .tracking-number { 
-            background: #007bff; 
-            color: white; 
-            padding: 15px; 
-            text-align: center; 
-            font-size: 18px; 
-            margin: 20px 0; 
-            border-radius: 8px;
-          }
-          .surprise-note { 
-            background: #ffeb3b; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin: 15px 0;
-            text-align: center;
-            font-weight: bold;
-          }
-          .detail-section { margin: 15px 0; padding: 15px; background: white; border-radius: 8px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🎁 Surprise Gift Scheduled!</h1>
-          </div>
-          <div class="content">
-            <div class="surprise-note">
-              🤫 This is a SURPRISE gift! The recipient will not be notified.
-            </div>
-            
-            <div class="tracking-number">
-              <strong>Tracking Number:</strong> ${details.trackingNumber}
-            </div>
-            
-            <div class="detail-section">
-              <h3>🎯 Delivery Details</h3>
-              <p><strong>Recipient:</strong> ${details.recipientName}</p>
-              <p><strong>Delivery Address:</strong> ${details.recipientAddress}</p>
-              <p><strong>Delivery Date:</strong> ${details.deliveryDate}</p>
-              <p><strong>Delivery Time:</strong> ${details.deliveryTime}</p>
-            </div>
-
-            <div class="detail-section">
-              <h3>🎁 Gift Items</h3>
-              <ul>
-                ${details.cartItems.map(item => `
-                  <li>${item.name} × ${item.quantity} - ₦${(item.price * item.quantity).toLocaleString()}</li>
-                `).join('')}
-              </ul>
-              <p><strong>Total Amount:</strong> ₦${details.totalAmount.toLocaleString()}</p>
-            </div>
-
-            ${details.personalMessage ? `
-            <div class="detail-section">
-              <h3>💌 Your Personal Message</h3>
-              <p><em>"${details.personalMessage}"</em></p>
-            </div>
-            ` : ''}
-
-            ${details.specialInstructions ? `
-            <div class="detail-section">
-              <h3>📝 Special Instructions</h3>
-              <p>${details.specialInstructions}</p>
-            </div>
-            ` : ''}
-
-            <div class="detail-section">
-              <h3>📞 Need Help?</h3>
-              <p>Contact us if you need to make changes to your surprise gift delivery.</p>
-            </div>
-
-            <p>Thank you for choosing Naija Gifts for your surprise delivery! 🎀</p>
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
-}
-
-
-export async function GET(req) {
+// Also add a GET endpoint if you need to fetch scheduled gifts
+export async function GET(request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const email = searchParams.get('email');
-
-    if (!email) {
-      return NextResponse.json({ success: false, message: 'Missing email', gifts: [] }, { status: 400 });
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: 'Need to be signed in',
+          gifts: [] 
+        },
+        { status: 401 }
+      );
     }
 
-    const gifts = await getScheduledGiftsByEmail(email);
-    return NextResponse.json({ success: true, gifts });
-  } catch (err) {
-    console.error('❌ Error fetching gifts:', err);
-    return NextResponse.json({ success: false, message: err.message, gifts: [] }, { status: 500 });
+    await connectDB();
+
+    const gifts = await ScheduledGift.find({ 
+      customerEmail: session.user.email 
+    })
+    .sort({ deliveryDate: 1, createdAt: -1 })
+    .limit(20);
+
+    return NextResponse.json({ 
+      success: true,
+      gifts: gifts.map(gift => ({
+        id: gift._id,
+        trackingNumber: gift.trackingNumber,
+        recipientName: gift.recipientName,
+        deliveryDate: gift.deliveryDate,
+        status: gift.status,
+        totalAmount: gift.totalAmount,
+        items: gift.cartItems?.length || 0
+      }))
+    });
+
+  } catch (error) {
+    console.error('Error fetching gifts:', error);
+    return NextResponse.json(
+      { 
+        success: false, 
+        message: 'Could not load gifts',
+        gifts: [] 
+      },
+      { status: 500 }
+    );
   }
 }

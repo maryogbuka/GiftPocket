@@ -5,17 +5,25 @@ import { authOptions } from "@/lib/auth-options";
 import { connectDB } from "@/lib/mongodb";
 import InAppNotification from "@/models/InAppNotification";
 
-// GET - Fetch user notifications
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
+    
+    // Return early if no session
     if (!session?.user) {
+      console.log('No session found');
       return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
+        { 
+          success: false, 
+          message: 'Unauthorized',
+          data: { notifications: [], unreadCount: 0, totalCount: 0 }
+        },
         { status: 401 }
       );
     }
 
+    console.log('Fetching notifications for user:', session.user.id);
+    
     await connectDB();
 
     const { searchParams } = new URL(request.url);
@@ -33,12 +41,16 @@ export async function GET(request) {
       query.isRead = false;
     }
 
+    console.log('Query:', query);
+
     // Get notifications
     const notifications = await InAppNotification.find(query)
       .sort({ createdAt: -1 })
       .limit(limit)
-      .populate('orderId', 'orderId status scheduledDate')
+      .populate('orderId', 'orderId status scheduledDate deliveryDate')
       .lean();
+
+    console.log('Found notifications:', notifications.length);
 
     // Get unread count
     const unreadCount = await InAppNotification.countDocuments({
@@ -48,60 +60,29 @@ export async function GET(request) {
       expiresAt: { $gt: new Date() }
     });
 
+    console.log('Unread count:', unreadCount);
+
     return NextResponse.json({
       success: true,
       data: {
-        notifications,
-        unreadCount,
-        totalCount: notifications.length
+        notifications: notifications || [],
+        unreadCount: unreadCount || 0,
+        totalCount: notifications.length || 0
       }
     });
 
   } catch (error) {
     console.error('Notifications fetch error:', error);
-    return NextResponse.json(
-      { success: false, message: 'Failed to fetch notifications' },
-      { status: 500 }
-    );
-  }
-}
-
-// POST - Create notification (admin use)
-export async function POST(request) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const body = await request.json();
-    const { userId, type, title, message, orderId, data } = body;
-
-    await connectDB();
-
-    const notification = await InAppNotification.create({
-      userId,
-      type,
-      title,
-      message,
-      orderId,
-      data: data || {},
-      createdAt: new Date()
-    });
-
+    
+    // Return empty data but with success false
     return NextResponse.json({
-      success: true,
-      data: notification
-    });
-
-  } catch (error) {
-    console.error('Create notification error:', error);
-    return NextResponse.json(
-      { success: false, message: 'Failed to create notification' },
-      { status: 500 }
-    );
+      success: false,
+      message: error.message || 'Failed to fetch notifications',
+      data: {
+        notifications: [],
+        unreadCount: 0,
+        totalCount: 0
+      }
+    }, { status: 500 });
   }
 }

@@ -2076,18 +2076,17 @@ const nigerianGifts = [
 
 
 
-// Updated categories with green color scheme
 const categories = [
-  { id: "all", name: "All Gifts", icon: Gift, color: "bg-green-600" },
-  { id: "food", name: "Food", icon: Cake, color: "bg-emerald-600" },
-  { id: "fashion", name: "Fashion", icon: Shirt, color: "bg-green-500" },
-  { id: "tech", name: "Tech", icon: Smartphone, color: "bg-lime-600" },
-  { id: "home", name: "Home", icon: Home, color: "bg-teal-600" },
-  { id: "experiences", name: "Experiences", icon: Sparkles, color: "bg-green-400" },
-  { id: "cash", name: "Cash Gifts", icon: Wallet, color: "bg-emerald-500" },
-  { id: "beauty", name: "Beauty", icon: Sparkles, color: "bg-green-300" },
-  { id: "kids", name: "Kids", icon: Users, color: "bg-emerald-400" },
-  { id: "corporate", name: "Corporate", icon: Award, color: "bg-green-700" },
+  { id: "all", name: "All Gifts", icon: Gift, color: "bg-[#1EB53A]" },
+  { id: "food", name: "Food", icon: Cake, color: "bg-[#189531]" },
+  { id: "fashion", name: "Fashion", icon: Shirt, color: "bg-[#1EB53A]" },
+  { id: "tech", name: "Tech", icon: Smartphone, color: "bg-[#16A34A]" },
+  { id: "home", name: "Home", icon: Home, color: "bg-[#1EB53A]/90" },
+  { id: "experiences", name: "Experiences", icon: Sparkles, color: "bg-[#189531]" },
+  { id: "cash", name: "Cash Gifts", icon: Wallet, color: "bg-[#1EB53A]" },
+  { id: "beauty", name: "Beauty", icon: Sparkles, color: "bg-[#16A34A]" },
+  { id: "kids", name: "Kids", icon: Users, color: "bg-[#1EB53A]" },
+  { id: "corporate", name: "Corporate", icon: Award, color: "bg-[#189531]" },
 ];
 
 // Sort options (same as before)
@@ -2100,13 +2099,50 @@ const sortOptions = [
   { id: "discount", label: "Best Discount" },
 ];
 
+// Helper function for theme-aware classes - Updated to match GiftSchedulingModal
+function getThemeClasses(isDark = false) {
+  return {
+    bg: {
+      primary: isDark ? "bg-gray-900" : "bg-gray-50",
+      secondary: isDark ? "bg-gray-800" : "bg-white",
+      card: isDark ? "bg-gray-800" : "bg-white",
+      overlay: isDark ? "bg-black/70" : "bg-black/50",
+      green: isDark ? "bg-[#1EB53A]/20" : "bg-[#1EB53A]/10",
+      gray: isDark ? "bg-gray-700" : "bg-gray-50",
+      hover: isDark ? "bg-gray-700" : "bg-gray-50",
+      yellow: isDark ? "bg-yellow-900/30" : "bg-yellow-50",
+      red: isDark ? "bg-red-900/30" : "bg-red-50",
+      blue: isDark ? "bg-blue-900/30" : "bg-blue-50",
+    },
+    text: {
+      primary: isDark ? "text-white" : "text-gray-800",
+      secondary: isDark ? "text-gray-300" : "text-gray-600",
+      muted: isDark ? "text-gray-400" : "text-gray-500",
+      green: "text-[#1EB53A]",
+      yellow: isDark ? "text-yellow-300" : "text-yellow-800",
+      red: isDark ? "text-red-300" : "text-red-800",
+      blue: isDark ? "text-blue-300" : "text-blue-800",
+    },
+    border: {
+      primary: isDark ? "border-gray-700" : "border-gray-200",
+      secondary: isDark ? "border-gray-600" : "border-gray-200",
+      green: isDark ? "border-[#1EB53A]/30" : "border-[#1EB53A]/30",
+      yellow: isDark ? "border-yellow-700" : "border-yellow-200",
+      red: isDark ? "border-red-700" : "border-red-200",
+      blue: isDark ? "border-blue-700" : "border-blue-200",
+    },
+    shadow: isDark ? "shadow-lg shadow-black/20" : "shadow-sm",
+    isDark
+  };
+}
+
 // Custom toast system
 const showToast = (message, type = 'success') => {
   // Implementation would be same as before
   console.log(`${type}: ${message}`);
 };
 
-// Gift Card Component - Updated with green colors
+// Gift Card Component - Updated to match GiftSchedulingModal
 const GiftCard = ({ 
   gift, 
   index, 
@@ -2116,6 +2152,30 @@ const GiftCard = ({
   onToggleWishlist,
   onQuickView 
 }) => {
+  // Get theme from global setting (document.documentElement class)
+  const [isDark, setIsDark] = useState(false);
+  
+  // Check for global theme on mount and when it changes
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      setIsDark(isDarkMode);
+    };
+    
+    // Initial check
+    checkTheme();
+    
+    // Observe changes to html class
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+  
+  const theme = getThemeClasses(isDark);
   const isInWishlist = wishlist.includes(gift.id);
   const discountedPrice = gift.discount 
     ? gift.price * (1 - gift.discount / 100)
@@ -2127,15 +2187,15 @@ const GiftCard = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05 }}
-        className="bg-white rounded-2xl border p-4 hover:shadow-lg transition-all"
+        className={`${theme.bg.card} rounded-xl border ${theme.border.primary} p-4 hover:shadow-md transition-all`}
       >
         <div className="flex gap-4">
           <div className="relative w-32 h-32 shrink-0">
-            <div className="w-full h-full bg-green-50 rounded-xl flex items-center justify-center">
-              <Gift className="w-8 h-8 text-green-600" />
+            <div className={`w-full h-full ${theme.bg.green} rounded-xl flex items-center justify-center border border-[#1EB53A]/30`}>
+              <Gift className="w-8 h-8 text-[#1EB53A]" />
             </div>
             {gift.popular && (
-              <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+              <div className="absolute top-2 left-2 bg-[#1EB53A] text-white px-2 py-1 rounded-full text-xs font-bold">
                 🔥 POPULAR
               </div>
             )}
@@ -2144,31 +2204,31 @@ const GiftCard = ({
           <div className="flex-1">
             <div className="flex items-start justify-between mb-2">
               <div>
-                <h3 className="font-bold text-gray-800 text-lg">{gift.name}</h3>
-                <p className="text-gray-600 text-sm line-clamp-2">{gift.description}</p>
+                <h3 className={`font-bold ${theme.text.primary} text-lg`}>{gift.name}</h3>
+                <p className={`${theme.text.secondary} text-sm line-clamp-2`}>{gift.description}</p>
               </div>
               <div className="flex flex-col items-end gap-1">
                 {discountedPrice ? (
                   <>
-                    <span className="text-xl font-bold text-green-600">
+                    <span className="text-xl font-bold text-[#1EB53A]">
                       ₦{discountedPrice.toLocaleString()}
                     </span>
-                    <span className="text-sm text-gray-400 line-through">
+                    <span className={`text-sm ${theme.text.muted} line-through`}>
                       ₦{gift.price.toLocaleString()}
                     </span>
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    <span className={`text-xs ${theme.bg.green} text-[#1EB53A] px-2 py-1 rounded-full border border-[#1EB53A]/30`}>
                       -{gift.discount}% OFF
                     </span>
                   </>
                 ) : (
-                  <span className="text-xl font-bold text-green-600">
+                  <span className="text-xl font-bold text-[#1EB53A]">
                     ₦{gift.price.toLocaleString()}
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+            <div className={`flex items-center gap-4 text-sm ${theme.text.secondary} mb-4`}>
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 text-yellow-400 fill-current" />
                 <span>{gift.rating}</span>
@@ -2180,7 +2240,7 @@ const GiftCard = ({
               </div>
               {gift.stock && (
                 <div className={`flex items-center gap-1 ${
-                  gift.stock < 5 ? 'text-red-600' : 'text-green-600'
+                  gift.stock < 5 ? 'text-red-500' : 'text-[#1EB53A]'
                 }`}>
                   <Package className="w-4 h-4" />
                   <span>{gift.stock} left</span>
@@ -2192,18 +2252,18 @@ const GiftCard = ({
               {gift.tags?.slice(0, 3).map(tag => (
                 <span
                   key={tag}
-                  className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full"
+                  className={`px-2 py-1 ${theme.bg.green} text-[#1EB53A] text-xs rounded-full border border-[#1EB53A]/30`}
                 >
                   {tag}
                 </span>
               ))}
               {gift.localMade && (
-                <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">
+                <span className={`px-2 py-1 ${theme.bg.green} text-[#1EB53A] text-xs rounded-full border border-[#1EB53A]/30`}>
                   🇳🇬 Local
                 </span>
               )}
               {gift.ecoFriendly && (
-                <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">
+                <span className={`px-2 py-1 ${theme.isDark ? 'bg-teal-900/30' : 'bg-teal-100'} text-teal-600 text-xs rounded-full`}>
                   🌿 Eco
                 </span>
               )}
@@ -2212,7 +2272,7 @@ const GiftCard = ({
             <div className="flex gap-2">
               <button
                 onClick={() => onAddToCart(gift)}
-                className="flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 hover:shadow-lg transition-all"
+                className={`flex-1 bg-linear-to-r bg-[#1EB53A]/30 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all shadow-sm`}
               >
                 Add to Cart
               </button>
@@ -2220,15 +2280,15 @@ const GiftCard = ({
                 onClick={() => onToggleWishlist(gift.id)}
                 className={`p-3 rounded-xl border ${
                   isInWishlist
-                    ? 'bg-pink-50 border-pink-200 text-pink-600'
-                    : 'bg-green-50 border-green-200 text-green-600 hover:bg-green-100'
+                    ? `${theme.isDark ? 'bg-pink-900/30' : 'bg-pink-50'} ${theme.isDark ? 'border-pink-700' : 'border-pink-200'} text-pink-600`
+                    : `${theme.bg.green} border border-[#1EB53A]/30 text-[#1EB53A] hover:bg-[#1EB53A]/20`
                 }`}
               >
                 <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
               </button>
               <button
                 onClick={() => onQuickView(gift)}
-                className="p-3 bg-green-50 border border-green-200 text-green-600 rounded-xl hover:bg-green-100"
+                className={`p-3 ${theme.bg.green} border border-[#1EB53A]/30 text-[#1EB53A] rounded-xl hover:bg-[#1EB53A]/20`}
               >
                 <Eye className="w-5 h-5" />
               </button>
@@ -2239,70 +2299,69 @@ const GiftCard = ({
     );
   }
 
-  // Grid view - Updated with green colors
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: index * 0.1 }}
-      className="bg-white rounded-2xl border overflow-hidden hover:shadow-xl transition-all duration-300 group"
+      className={`${theme.bg.card} rounded-xl border ${theme.border.primary} overflow-hidden hover:shadow-md transition-all duration-300 group`}
     >
       {/* Image/Header */}
       <div className="relative h-48 overflow-hidden">
-        <div className="absolute inset-0 bg-green-50"></div>
+        <div className={`absolute inset-0 ${theme.bg.green}`}></div>
         {gift.featured && (
-          <div className="absolute top-3 left-3 bg-yellow-400 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+          <div className="absolute top-3 left-3 bg-yellow-400 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">
             ⭐ FEATURED
           </div>
         )}
         {gift.discount && (
-          <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+          <div className="absolute top-3 right-3 bg-[#1EB53A] text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">
             -{gift.discount}% OFF
           </div>
         )}
         <button
           onClick={() => onToggleWishlist(gift.id)}
-          className={`absolute top-12 right-3 p-2 rounded-full shadow-lg transition-all ${
+          className={`absolute top-12 right-3 p-2 rounded-full shadow-sm transition-all ${
             isInWishlist
               ? 'bg-pink-600 text-white'
-              : 'bg-white text-green-600 hover:bg-green-50'
+              : `${theme.bg.card} text-[#1EB53A] hover:bg-[#1EB53A]/10 border border-[#1EB53A]/30`
           }`}
         >
           <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
         </button>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-green-900/20 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-black/20 to-transparent"></div>
       </div>
 
       {/* Content */}
       <div className="p-5">
         <div className="flex items-start justify-between mb-3">
-          <h3 className="font-bold text-gray-800 text-lg line-clamp-1 flex-1 pr-2">
+          <h3 className={`font-bold ${theme.text.primary} text-lg line-clamp-1 flex-1 pr-2`}>
             {gift.name}
           </h3>
           {discountedPrice ? (
             <div className="text-right">
-              <div className="text-xl font-bold text-green-600">
+              <div className="text-xl font-bold text-[#1EB53A]">
                 ₦{discountedPrice.toLocaleString()}
               </div>
-              <div className="text-sm text-gray-400 line-through">
+              <div className={`text-sm ${theme.text.muted} line-through`}>
                 ₦{gift.price.toLocaleString()}
               </div>
             </div>
           ) : (
-            <div className="text-xl font-bold text-green-600">
+            <div className="text-xl font-bold text-[#1EB53A]">
               {gift.price > 0 ? `₦${gift.price.toLocaleString()}` : 'Custom Amount'}
             </div>
           )}
         </div>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{gift.description}</p>
+        <p className={`${theme.text.secondary} text-sm mb-4 line-clamp-2`}>{gift.description}</p>
 
         {/* Rating and Delivery */}
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+        <div className={`flex items-center justify-between text-sm ${theme.text.secondary} mb-4`}>
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-yellow-400 fill-current" />
             <span className="font-medium">{gift.rating}</span>
-            <span className="text-gray-400">({gift.reviews})</span>
+            <span className={theme.text.muted}>({gift.reviews})</span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="w-4 h-4" />
@@ -2315,18 +2374,18 @@ const GiftCard = ({
           {gift.tags?.slice(0, 2).map(tag => (
             <span
               key={tag}
-              className="px-2.5 py-1 bg-green-50 text-green-700 text-xs rounded-full"
+              className={`px-2.5 py-1 ${theme.bg.green} text-[#1EB53A] text-xs rounded-full border border-[#1EB53A]/30`}
             >
               {tag}
             </span>
           ))}
           {gift.localMade && (
-            <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">
+            <span className={`px-2.5 py-1 ${theme.bg.green} text-[#1EB53A] text-xs rounded-full border border-[#1EB53A]/30`}>
               🇳🇬 Local
             </span>
           )}
           {gift.stock && gift.stock < 5 && (
-            <span className="px-2.5 py-1 bg-red-100 text-red-700 text-xs rounded-full">
+            <span className={`px-2.5 py-1 ${theme.bg.red} ${theme.text.red} text-xs rounded-full`}>
               ⚡ Only {gift.stock} left
             </span>
           )}
@@ -2336,13 +2395,13 @@ const GiftCard = ({
         <div className="flex gap-2">
           <button
             onClick={() => onAddToCart(gift)}
-            className="flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 hover:shadow-lg transition-all hover:scale-[1.02]"
+            className={`flex-1 bg-linear-to-r bg-[#1EB53A] text-white py-3 rounded-xl font-semibold hover:shadow-md transition-all hover:scale-[1.02] shadow-sm`}
           >
             Add to Cart
           </button>
           <button
             onClick={() => onQuickView(gift)}
-            className="p-3 bg-green-100 text-green-700 rounded-xl hover:bg-green-200 transition-colors flex items-center justify-center"
+            className={`p-3 ${theme.bg.green} text-[#1EB53A] rounded-xl hover:bg-[#1EB53A]/20 transition-colors flex items-center justify-center border border-[#1EB53A]/30`}
             title="Quick View"
           >
             <Eye className="w-5 h-5" />
@@ -2353,7 +2412,7 @@ const GiftCard = ({
   );
 };
 
-// Enhanced Cart Sidebar - Updated with green colors and media capture
+// Enhanced Cart Sidebar - Updated to match GiftSchedulingModal
 const EnhancedCartSidebar = ({ 
   cart = [], 
   setCart, 
@@ -2363,8 +2422,31 @@ const EnhancedCartSidebar = ({
   recommendedGifts = [],
   onAddRecommendation 
 }) => {
-  const [includeMediaCapture, setIncludeMediaCapture] = useState(false);
+  // Get theme from global setting
+  const [isDark, setIsDark] = useState(false);
   
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      setIsDark(isDarkMode);
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+  
+  const theme = getThemeClasses(isDark);
+  const [includeMediaCapture, setIncludeMediaCapture] = useState(false);
+
+
+
   const updateQuantity = (id, quantity) => {
     const safeQuantity = Math.max(0, quantity);
 
@@ -2403,7 +2485,7 @@ const EnhancedCartSidebar = ({
   const standardWrapCost = cart.filter(item => item.wrapType === 'standard').length * 2000;
   const premiumWrapCost = cart.filter(item => item.wrapType === 'premium').length * 5000;
   const mediaCaptureCost = includeMediaCapture ? 10000 : 0;
-  const deliveryCost = cart.length > 0 ? 1500 : 0;
+  const deliveryCost = cart.length > 0 ? 15000 : 0;
   
   const totalWrapCost = standardWrapCost + premiumWrapCost;
   const totalCost = cartTotal + totalWrapCost + mediaCaptureCost + deliveryCost;
@@ -2413,7 +2495,7 @@ const EnhancedCartSidebar = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 z-50 flex justify-end"
+      className={`fixed inset-0 ${theme.bg.overlay} z-50 flex justify-end`}
       onClick={onClose}
     >
       <motion.div
@@ -2421,258 +2503,283 @@ const EnhancedCartSidebar = ({
         animate={{ x: 0 }}
         exit={{ x: '100%' }}
         transition={{ type: 'spring', damping: 25 }}
-        className="w-full max-w-md bg-white h-full overflow-y-auto shadow-2xl"
+        className={`w-full max-w-md h-full overflow-y-auto ${theme.shadow}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800">Your Cart</h2>
-              <p className="text-sm text-gray-500">{cart.length} items</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-green-50 rounded-xl text-green-600"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-          </div>
-
-          {cart.length === 0 ? (
-            <div className="text-center py-12">
-              <ShoppingCart className="w-20 h-20 text-green-300 mx-auto mb-6" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                Your cart is empty
-              </h3>
-              <p className="text-gray-500 mb-6">Add some thoughtful gifts!</p>
+        <div className={`h-full ${theme.bg.card}`}>
+          <div className="p-6">
+            {/* Header - Matching GiftSchedulingModal */}
+            <div className={`flex justify-between items-center p-6 border-b ${theme.border.primary}`}>
+              <div>
+                <h2 className={`text-2xl font-bold ${theme.text.primary}`}>Your Cart</h2>
+                <p className={`${theme.text.secondary} text-sm mt-1`}>{cart.length} items</p>
+              </div>
               <button
                 onClick={onClose}
-                className="px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 hover:shadow-lg transition-all"
+                className={`p-2 hover:bg-[#1EB53A]/10 rounded-xl transition-colors`}
               >
-                Continue Shopping
+                <span className={`text-2xl ${theme.text.muted} hover:${theme.text.primary}`}>×</span>
               </button>
             </div>
-          ) : (
-            <>
-              {/* Cart Items */}
-              <div className="space-y-4 mb-6 max-h-[50vh] overflow-y-auto pr-2">
-                {cart.map(item => {
-                  const price = item.discount 
-                    ? item.price * (1 - item.discount / 100)
-                    : item.price;
-                  const itemTotal = price * item.quantity;
-                  const wrapCost = item.wrapType === 'standard' ? 2000 : 
-                                  item.wrapType === 'premium' ? 5000 : 0;
 
-                  return (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="bg-green-50 rounded-xl p-4 border border-green-200"
-                    >
-                      <div className="flex gap-4">
-                        <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
-                          <Gift className="w-6 h-6 text-green-600" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between mb-2">
-                            <h4 className="font-semibold text-gray-800 line-clamp-1">
-                              {item.name}
-                            </h4>
-                            <button
-                              onClick={() => updateQuantity(item.id, 0)}
-                              className="text-green-400 hover:text-red-500"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                          
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="text-green-600 font-bold">
-                              ₦{itemTotal.toLocaleString()}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                                className="w-7 h-7 bg-green-200 rounded-lg flex items-center justify-center hover:bg-green-300 text-green-700"
-                              >
-                                <Minus className="w-3 h-3" />
-                              </button>
-                              <span className="font-medium w-8 text-center text-green-700">
-                                {item.quantity}
-                              </span>
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="w-7 h-7 bg-green-200 rounded-lg flex items-center justify-center hover:bg-green-300 text-green-700"
-                              >
-                                <Plus className="w-3 h-3" />
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Gift wrap options - Updated prices */}
-                          <div className="mt-3 pt-3 border-t border-green-200">
-                            <p className="text-sm text-green-700 mb-2">Gift Wrap:</p>
-                            <div className="flex gap-2">
-                              {[
-                                { type: 'standard', label: 'Standard (+₦2,000)' },
-                                { type: 'premium', label: 'Premium (+₦5,000)' }
-                              ].map(({ type, label }) => (
-                                <button
-                                  key={type}
-                                  onClick={() => applyGiftWrap(item.id, type)}
-                                  className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
-                                    item.wrapType === type
-                                      ? 'bg-green-100 text-green-700 border-2 border-green-300 font-medium'
-                                      : 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200'
-                                  }`}
-                                >
-                                  {label}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+            {cart.length === 0 ? (
+              <div className="text-center py-12">
+                <ShoppingCart className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+                <h3 className={`text-xl font-semibold ${theme.text.primary} mb-2`}>
+                  Your cart is empty
+                </h3>
+                <p className={`${theme.text.muted} mb-6`}>Add some thoughtful gifts!</p>
+                <button
+                  onClick={onClose}
+                  className="px-6 py-3 bg-linear-to-r from-[#1EB53A] to-[#16A34A] text-white rounded-xl font-semibold hover:shadow-md transition-all shadow-sm"
+                >
+                  Continue Shopping
+                </button>
               </div>
+            ) : (
+              <>
+                {/* Cart Items - Matching GiftSchedulingModal style */}
+                <div className="space-y-4 mb-6 max-h-[50vh] overflow-y-auto pr-2">
+                  {cart.map(item => {
+                    const price = item.discount 
+                      ? item.price * (1 - item.discount / 100)
+                      : item.price;
+                    const itemTotal = price * item.quantity;
+                    const wrapCost = item.wrapType === 'standard' ? 2000 : 
+                                    item.wrapType === 'premium' ? 5000 : 0;
 
-              {/* Media Capture Option */}
-              <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-start gap-3">
-                    <Camera className="w-5 h-5 text-blue-600 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-blue-800">Media Capture Service</h4>
-                      <p className="text-sm text-blue-600">Capture recipient&apos;s reaction to your gift</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-blue-700">₦10,000</p>
-                    <p className="text-xs text-blue-500">One-time fee</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between mt-3">
-                  <div className="text-sm text-blue-600">
-                    <p className="font-medium">What&apos;s included:</p>
-                    <ul className="list-disc list-inside text-xs mt-1 space-y-1">
-                      <li>Professional photo/video of gift unboxing</li>
-                      <li>Edited highlight reel (up to 2 minutes)</li>
-                      <li>Digital delivery within 24 hours</li>
-                    </ul>
-                  </div>
-                  <button
-                    onClick={() => setIncludeMediaCapture(!includeMediaCapture)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                      includeMediaCapture
-                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                        : 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50'
-                    }`}
-                  >
-                    {includeMediaCapture ? (
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4" />
-                        Added
-                      </div>
-                    ) : (
-                      'Add Service'
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Recommendations */}
-              {recommendedGifts.length > 0 && (
-                <div className="mb-6">
-                  <h4 className="font-semibold text-green-800 mb-3">Add these too:</h4>
-                  <div className="space-y-2">
-                    {recommendedGifts.map(gift => (
-                      <div
-                        key={gift.id}
-                        className="flex items-center justify-between p-3 bg-green-50 rounded-xl border border-green-100"
+                    return (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className={`${theme.bg.secondary} rounded-xl p-4 border ${theme.border.primary}`}
                       >
-                        <div>
-                          <p className="font-medium text-gray-800">{gift.name}</p>
-                          <p className="text-sm text-green-600 font-bold">
-                            ₦{gift.price.toLocaleString()}
-                          </p>
+                        <div className="flex gap-4">
+                          <div className={`w-16 h-16 ${theme.bg.green} rounded-lg flex items-center justify-center shrink-0 border border-[#1EB53A]/30`}>
+                            <Gift className="w-6 h-6 text-[#1EB53A]" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-2">
+                              <h4 className={`font-semibold ${theme.text.primary} line-clamp-1`}>
+                                {item.name}
+                              </h4>
+                              <button
+                                onClick={() => updateQuantity(item.id, 0)}
+                                className={`text-gray-400 hover:text-red-500 ${theme.text.muted}`}
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                            
+                            <div className="flex items-center justify-between mb-3">
+                              <div className={`text-[#1EB53A] font-bold`}>
+                                ₦{itemTotal.toLocaleString()}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                                  className={`w-7 h-7 ${theme.bg.green} rounded-lg flex items-center justify-center hover:bg-[#1EB53A]/20 text-[#1EB53A] border border-[#1EB53A]/30`}
+                                >
+                                  <Minus className="w-3 h-3" />
+                                </button>
+                                <span className={`font-medium w-8 text-center ${theme.text.primary}`}>
+                                  {item.quantity}
+                                </span>
+                                <button
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                  className={`w-7 h-7 ${theme.bg.green} rounded-lg flex items-center justify-center hover:bg-[#1EB53A]/20 text-[#1EB53A] border border-[#1EB53A]/30`}
+                                >
+                                  <Plus className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Gift wrap options - Matching GiftSchedulingModal */}
+                            <div className={`mt-3 pt-3 border-t ${theme.border.primary}`}>
+                              <p className={`text-sm ${theme.text.secondary} mb-2`}>Gift Wrap:</p>
+                              <div className="flex gap-2">
+                                {[
+                                  { type: 'none', label: 'No Wrap' },
+                                  { type: 'standard', label: 'Standard (₦2,000)' },
+                                  { type: 'premium', label: 'Premium (₦5,000)' }
+                                ].map(({ type, label }) => (
+                                  <button
+                                    key={type}
+                                    onClick={() => applyGiftWrap(item.id, type)}
+                                    className={`px-3 py-1.5 text-sm rounded-lg transition-all border ${
+                                      item.wrapType === type
+                                        ? `bg-[#1EB53A] text-white font-sm border-[#1EB53A]`
+                                        : `${theme.bg.secondary} ${theme.text.secondary} hover:bg-[#1EB53A]/10 border ${theme.border.primary}`
+                                    }`}
+                                  >
+                                    {label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <button
-                          onClick={() => onAddRecommendation(gift)}
-                          className="px-4 py-2 bg-white border border-green-300 text-green-600 rounded-lg font-medium hover:bg-green-50"
-                        >
-                          Add
-                        </button>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {/* Media Capture Option*/}
+                <div className={`mb-6 p-4 ${theme.bg.secondary} rounded-xl border ${theme.border.primary}`}>
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-start gap-3">
+                      <Camera className="w-5 h-5 text-blue-500 mt-0.5" />
+                      <div>
+                        <h4 className={`font-semibold ${theme.text.primary}`}>Media Capture Service</h4>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Summary */}
-              <div className="border-t border-green-200 pt-6">
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium text-gray-600">₦{cartTotal.toLocaleString()}</span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Gift Wrap</span>
-                    <span className="font-medium text-gray-600">₦{totalWrapCost.toLocaleString()}</span>
-                  </div>
-
-                  {includeMediaCapture && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Media Capture</span>
-                      <span className="font-medium text-gray-600">₦10,000</span>
                     </div>
-                  )}
-
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Delivery</span>
-                    <span className="font-medium text-gray-600">₦{deliveryCost.toLocaleString()}</span>
+                    <div className="text-right">
+                      <p className={`text-lg font-bold ${theme.text.primary}`}>₦15,000</p>
+                    </div>
                   </div>
-
-                  <div className="flex justify-between text-gray-600 text-lg font-bold pt-3 border-t border-green-200">
-                    <span>Total</span>
-                    <span className="text-green-600">₦{totalCost.toLocaleString()}</span>
+                  <div className="flex items-center justify-between mt-3">
+                    <div className={`text-sm ${theme.text.secondary}`}>
+                      <p className="font-sm">What&apos;s included:</p>
+                      <ul className="list-disc list-inside text-xs mt-1 space-y-1">
+                        <li>Professional photo/video of gift unboxing</li>
+                        <li>Edited highlight reel (up to 2 minutes)</li>
+                        <li>Digital delivery within 24 hours</li>
+                      </ul>
+                    </div>
+                    <button
+                      onClick={() => setIncludeMediaCapture(!includeMediaCapture)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all border ${
+                        includeMediaCapture
+                          ? 'bg-blue-500 text-white hover:bg-blue-600 border-blue-500'
+                          : `${theme.bg.secondary} ${theme.text.primary} border ${theme.border.primary} hover:bg-[#1EB53A]/10`
+                      }`}
+                    >
+                      {includeMediaCapture ? (
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4" />
+                          Added
+                        </div>
+                      ) : (
+                        'Add Service'
+                      )}
+                    </button>
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <button
-                    onClick={() => {
-                      onClose();
-                      onSchedule();
-                    }}
-                    className="w-full bg-green-600 text-white py-4 rounded-xl font-bold 
-                    text-lg hover:bg-green-700 hover:shadow-xl transition-all hover:scale-[1.02]"
-                  >
-                    Schedule Delivery
-                  </button>
-                  <button
-                    onClick={onClose}
-                    className="w-full py-3 border-2 border-green-300 text-green-700 rounded-xl font-semibold hover:bg-green-50 transition-colors"
-                  >
-                    Continue Shopping
-                  </button>
+                {/* Recommendations*/}
+                {recommendedGifts.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className={`font-semibold ${theme.text.primary} mb-3`}>Add these too:</h4>
+                    <div className="space-y-2">
+                      {recommendedGifts.map(gift => (
+                        <div
+                          key={gift.id}
+                          className={`flex items-center justify-between p-3 ${theme.bg.secondary} rounded-xl border ${theme.border.primary}`}
+                        >
+                          <div>
+                            <p className={`font-medium ${theme.text.primary}`}>{gift.name}</p>
+                            <p className={`text-sm text-[#1EB53A] font-bold`}>
+                              ₦{gift.price.toLocaleString()}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => onAddRecommendation(gift)}
+                            className={`px-4 py-2 ${theme.bg.secondary} border ${theme.border.primary} ${theme.text.primary} rounded-lg font-medium hover:bg-[#1EB53A]/10`}
+                          >
+                            Add
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Summary - Matching GiftSchedulingModal style */}
+                <div className={`border-t ${theme.border.primary} pt-6`}>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex justify-between">
+                      <span className={theme.text.secondary}>Subtotal</span>
+                      <span className={`font-medium ${theme.text.primary}`}>₦{cartTotal.toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span className={theme.text.secondary}>Gift Wrap</span>
+                      <span className={`font-medium ${theme.text.primary}`}>₦{totalWrapCost.toLocaleString()}</span>
+                    </div>
+
+                    {includeMediaCapture && (
+                      <div className="flex justify-between">
+                        <span className={theme.text.secondary}>Media Capture</span>
+                        <span className={`font-medium ${theme.text.primary}`}>₦15,000</span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between">
+                      <span className={theme.text.secondary}>Delivery</span>
+                      <span className={`font-medium ${theme.text.primary}`}>₦{deliveryCost.toLocaleString()}</span>
+                    </div>
+
+                    <div className={`flex justify-between text-lg font-bold mt-2 pt-2 border-t ${theme.border.primary}`}>
+                      <span className={theme.text.primary}>Total Amount</span>
+                      <span className={`text-[#1EB53A] font-bold`}>₦{totalCost.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  {/* Buttons - Matching GiftSchedulingModal */}
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onSchedule();
+                      }}
+                      className={`w-full bg-linear-to-r from-[#1EB53A] to-[#16A34A] text-white py-4 rounded-xl font-bold 
+                      text-lg hover:shadow-md transition-all hover:scale-[1.02] shadow-sm`}
+                    >
+                      Schedule Delivery
+                    </button>
+                    <button
+                      onClick={onClose}
+                      className={`w-full py-3 border-2 border-[#1EB53A]/30 text-[#1EB53A] rounded-xl font-semibold hover:bg-[#1EB53A]/10 transition-colors`}
+                    >
+                      Continue Shopping
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </motion.div>
     </motion.div>
   );
 };
 
-// Quick View Modal Component - Updated with green colors
+
 const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWishlist }) => {
+  // Get theme from global setting
+  const [isDark, setIsDark] = useState(false);
+  
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      setIsDark(isDarkMode);
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+  
+  const theme = getThemeClasses(isDark);
+  
+
   const isInWishlist = wishlist.includes(gift.id);
   const discountedPrice = gift.discount 
     ? gift.price * (1 - gift.discount / 100)
@@ -2685,25 +2792,25 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+      className={`fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4`}
       onClick={onClose}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-2xl w-full max-w-2xl overflow-auto max-h-[90vh]"
+        className={`${theme.bg.card} rounded-xl w-full max-w-2xl overflow-auto max-h-[90vh] shadow-sm border border-[#1EB53A]/30`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">{gift.name}</h2>
-              <p className="text-green-600">{gift.category}</p>
+              <h2 className={`text-2xl font-bold ${theme.text.primary}`}>{gift.name}</h2>
+              <p className="text-[#1EB53A]">{gift.category}</p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-green-50 text-green-600 rounded-xl"
+              className={`p-2 hover:bg-[#1EB53A]/10 text-gray-600 rounded-xl`}
             >
               <X className="w-5 h-5" />
             </button>
@@ -2712,25 +2819,25 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column - Image & Stats */}
             <div>
-              <div className="h-64 bg-green-50 rounded-2xl mb-4 flex items-center justify-center">
-                <Gift className="w-16 h-16 text-green-600" />
+              <div className={`h-64 ${theme.bg.green} rounded-xl mb-4 flex items-center justify-center border border-[#1EB53A]/30`}>
+                <Gift className="w-16 h-16 text-[#1EB53A]" />
               </div>
               
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-3 bg-green-50 rounded-xl">
-                  <Clock className="w-5 h-5 text-green-600 mx-auto mb-2" />
-                  <p className="text-sm text-green-500">Delivery</p>
-                  <p className="font-semibold text-green-600">{gift.delivery}</p>
+                <div className={`text-center p-3 ${theme.bg.green} rounded-xl border border-[#1EB53A]/30`}>
+                  <Clock className="w-5 h-5 text-[#1EB53A] mx-auto mb-2" />
+                  <p className={`text-sm text-[#1EB53A]`}>Delivery</p>
+                  <p className={`font-semibold text-[#1EB53A]`}>{gift.delivery}</p>
                 </div>
-                <div className="text-center p-3 bg-green-50 rounded-xl">
+                <div className={`text-center p-3 ${theme.bg.green} rounded-xl border border-[#1EB53A]/30`}>
                   <Star className="w-5 h-5 text-yellow-400 fill-current mx-auto mb-2" />
-                  <p className="text-sm text-green-500">Rating</p>
-                  <p className="font-semibold text-green-600">{gift.rating} ({gift.reviews})</p>
+                  <p className={`text-sm text-[#1EB53A]`}>Rating</p>
+                  <p className={`font-semibold text-[#1EB53A]`}>{gift.rating} ({gift.reviews})</p>
                 </div>
-                <div className="text-center p-3 bg-green-50 rounded-xl">
-                  <Package className="w-5 h-5 text-green-600 mx-auto mb-2" />
-                  <p className="text-sm text-green-500">Stock</p>
-                  <p className={`font-semibold ${gift.stock && gift.stock < 5 ? 'text-red-600' : 'text-green-600'}`}>
+                <div className={`text-center p-3 ${theme.bg.green} rounded-xl border border-[#1EB53A]/30`}>
+                  <Package className="w-5 h-5 text-[#1EB53A] mx-auto mb-2" />
+                  <p className={`text-sm text-[#1EB53A]`}>Stock</p>
+                  <p className={`font-semibold ${gift.stock && gift.stock < 5 ? 'text-red-500' : 'text-[#1EB53A]'}`}>
                     {gift.stock || 'Available'}
                   </p>
                 </div>
@@ -2740,18 +2847,18 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
                 {gift.tags?.map(tag => (
                   <span
                     key={tag}
-                    className="px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm"
+                    className={`px-3 py-1.5 ${theme.bg.green} text-[#1EB53A] rounded-full text-sm border border-[#1EB53A]/30`}
                   >
                     {tag}
                   </span>
                 ))}
                 {gift.localMade && (
-                  <span className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm">
+                  <span className={`px-3 py-1.5 ${theme.bg.green} text-[#1EB53A] rounded-full text-sm border border-[#1EB53A]/30`}>
                     🇳🇬 Local Product
                   </span>
                 )}
                 {gift.ecoFriendly && (
-                  <span className="px-3 py-1.5 bg-teal-100 text-teal-700 rounded-full text-sm">
+                  <span className={`px-3 py-1.5 ${theme.isDark ? 'bg-teal-900/30' : 'bg-teal-100'} text-teal-600 rounded-full text-sm`}>
                     🌿 Eco-Friendly
                   </span>
                 )}
@@ -2761,28 +2868,28 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
             {/* Right Column - Details */}
             <div>
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Description</h3>
-                <p className="text-gray-600 leading-relaxed">{gift.description}</p>
+                <h3 className={`text-lg font-semibold ${theme.text.primary} mb-3`}>Description</h3>
+                <p className={`${theme.text.secondary} leading-relaxed`}>{gift.description}</p>
               </div>
 
               {/* Pricing */}
               <div className="mb-6">
                 {discountedPrice ? (
                   <div className="space-y-1">
-                    <div className="text-3xl font-bold text-green-600">
+                    <div className="text-3xl font-bold text-[#1EB53A]">
                       ₦{discountedPrice.toLocaleString()}
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-lg text-gray-400 line-through">
+                      <span className={`text-lg ${theme.text.muted} line-through`}>
                         ₦{gift.price.toLocaleString()}
                       </span>
-                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold">
+                      <span className={`px-3 py-1 ${theme.bg.green} text-[#1EB53A] rounded-full font-bold border border-[#1EB53A]/30`}>
                         Save {gift.discount}%
                       </span>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-3xl font-bold text-green-600">
+                  <div className="text-3xl font-bold text-[#1EB53A]">
                     ₦{gift.price.toLocaleString()}
                   </div>
                 )}
@@ -2795,7 +2902,7 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
                     onAddToCart(gift);
                     onClose();
                   }}
-                  className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 hover:shadow-xl transition-all"
+                  className={`w-full bg-linear-to-r bg-[#1EB53A] text-white py-4 rounded-xl font-bold text-lg hover:shadow-md transition-all shadow-sm`}
                 >
                   Add to Cart
                 </button>
@@ -2805,8 +2912,8 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
                     onClick={() => onToggleWishlist(gift.id)}
                     className={`flex-1 py-3 rounded-xl border transition-all ${
                       isInWishlist
-                        ? 'bg-pink-50 border-pink-200 text-pink-600'
-                        : 'bg-green-50 border-green-200 text-green-600 hover:bg-green-100'
+                        ? `${theme.isDark ? 'bg-pink-900/30' : 'bg-pink-50'} ${theme.isDark ? 'border-pink-700' : 'border-pink-200'} text-pink-600`
+                        : `${theme.bg.green} border border-[#1EB53A]/30 text-[#1EB53A] hover:bg-[#1EB53A]/20`
                     } font-semibold`}
                   >
                     <div className="flex items-center justify-center gap-2">
@@ -2814,7 +2921,7 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
                       {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
                     </div>
                   </button>
-                  <button className="flex-1 py-3 bg-green-50 border border-green-200 text-green-600 rounded-xl font-semibold hover:bg-green-100 transition-all">
+                  <button className={`flex-1 py-3 ${theme.bg.green} border border-[#1EB53A]/30 text-[#1EB53A] rounded-xl font-semibold hover:bg-[#1EB53A]/20 transition-all`}>
                     <div className="flex items-center justify-center gap-2">
                       <Share2 className="w-5 h-5" />
                       Share
@@ -2830,10 +2937,35 @@ const QuickViewModal = ({ gift, onClose, onAddToCart, wishlist = [], onToggleWis
   );
 };
 
-// Main Component - Updated with OPay green colors
+// Main Component - Updated to match GiftSchedulingModal
 export default function GiftsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  
+  // Get theme from global setting
+  const [isDark, setIsDark] = useState(false);
+  
+  // Check for global theme on mount and when it changes
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      setIsDark(isDarkMode);
+    };
+    
+    // Initial check
+    checkTheme();
+    
+    // Observe changes to html class for theme changes
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+  
+  const theme = getThemeClasses(isDark);
 
   // State
   const [searchTerm, setSearchTerm] = useState("");
@@ -2879,7 +3011,7 @@ export default function GiftsPage() {
     }, 0);
   }, [cart]);
 
-  const mediaCaptureCost = includeMediaCapture ? 10000 : 0;
+  const mediaCaptureCost = includeMediaCapture ? 15000 : 0;
 
   // Enhanced filter logic
   const filteredGifts = useMemo(() => {
@@ -2991,7 +3123,7 @@ export default function GiftsPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-[#1EB53A] border-t-transparent rounded-full animate-spin"></div>
           <p className="text-gray-700 font-medium">Loading gifts...</p>
@@ -3003,566 +3135,563 @@ export default function GiftsPage() {
   if (!session) return null;
 
   return (
-    <>
-      <div className="min-h-screen bg-white">
-        {/* Enhanced Header */}
-        <header className="sticky top-0 z-50 bg-white backdrop-blur-lg border-b border-gray-200 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => router.back()}
-                  className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5 text-gray-700" />
-                </motion.button>
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <div className="w-10 h-10 bg-[#1EB53A] rounded-xl flex items-center justify-center">
-                      <Gift className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white"></div>
-                  </div>
-                  <div>
-                    <h1 className="text-xl font-bold text-gray-900">
-                      GiftPocket Gifts
-                    </h1>
-                    <p className="text-xs text-gray-500">Thoughtful gifts, delivered with love</p>
-                  </div>
-                </div>
-              </div>
-
+    <div className={`min-h-screen ${theme.bg.primary}`}>
+      {/* Enhanced Header */}
+      <header className={`sticky top-0 z-50 ${theme.bg.primary} backdrop-blur-lg border-b ${theme.border.primary} shadow-sm`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => router.back()}
+                className={`p-2 hover:bg-[#1EB53A]/10 rounded-xl transition-colors`}
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-700" />
+              </motion.button>
               <div className="flex items-center gap-3">
-                {/* Budget Input */}
-                <div className="hidden md:flex items-center gap-2">
-                  <button
-                    onClick={() => setShowBudgetInput(!showBudgetInput)}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-gray-700 hover:shadow-sm transition-all"
-                  >
-                    <Wallet className="w-4 h-4" />
-                    <span className="font-medium">Budget</span>
-                  </button>
-                  {showBudgetInput && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="flex items-center gap-2"
-                    >
-                      <input
-                        type="number"
-                        placeholder="₦ Max"
-                        value={budget || ''}
-                        onChange={(e) => setBudget(e.target.value ? Number(e.target.value) : null)}
-                        className="w-32 px-3 py-2 border text-gray-800 border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent"
-                      />
-                      {budget && (
-                        <button
-                          onClick={() => setBudget(null)}
-                          className="p-1 hover:bg-gray-100 rounded-lg"
-                        >
-                          <X className="w-4 h-4 text-gray-600" />
-                        </button>
-                      )}
-                    </motion.div>
-                  )}
+                <div className="relative">
+                  <div className="w-10 h-10 bg-[#1EB53A] rounded-xl flex items-center justify-center">
+                    <Gift className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white"></div>
                 </div>
-
-                {/* View Toggle */}
-                <div className="hidden md:flex items-center bg-gray-100 p-1 rounded-xl">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[#1EB53A] text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}
-                  >
-                    <div className="w-4 h-4">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="3" width="7" height="7" rx="1" />
-                        <rect x="14" y="3" width="7" height="7" rx="1" />
-                        <rect x="3" y="14" width="7" height="7" rx="1" />
-                        <rect x="14" y="14" width="7" height="7" rx="1" />
-                      </svg>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[#1EB53A] text-white shadow' : 'text-gray-600 hover:bg-gray-200'}`}
-                  >
-                    <div className="w-4 h-4">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="8" y1="6" x2="21" y2="6" />
-                        <line x1="8" y1="12" x2="21" y2="12" />
-                        <line x1="8" y1="18" x2="21" y2="18" />
-                        <line x1="3" y1="6" x2="3.01" y2="6" />
-                        <line x1="3" y1="12" x2="3.01" y2="12" />
-                        <line x1="3" y1="18" x2="3.01" y2="18" />
-                      </svg>
-                    </div>
-                  </button>
+                <div>
+                  <h1 className={`text-xl font-bold ${theme.text.primary}`}>
+                    GiftPocket Gifts
+                  </h1>
+                  <p className={`text-xs ${theme.text.muted}`}>Thoughtful gifts, delivered with love</p>
                 </div>
+              </div>
+            </div>
 
-                {/* Cart with animation */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowCart(true)}
-                  className="relative p-3 bg-gray-50 rounded-xl hover:shadow-md transition-all"
+            <div className="flex items-center gap-3">
+              {/* Budget Input */}
+              <div className="hidden md:flex items-center gap-2">
+                <button
+                  onClick={() => setShowBudgetInput(!showBudgetInput)}
+                  className={`flex items-center gap-2 px-3 py-2 ${theme.bg.green} border border-[#1EB53A]/30 rounded-xl ${theme.text.primary} hover:shadow-sm transition-all`}
                 >
-                  <ShoppingCart className="w-5 h-5 text-gray-700" />
-                  {cart.length > 0 && (
-                    <>
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -top-1 -right-1 bg-[#1EB53A] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
-                      >
-                        {cart.reduce((sum, item) => sum + item.quantity, 0)}
-                      </motion.span>
-                      <div className="absolute -bottom-1 inset-x-0 h-1 bg-[#1EB53A] rounded-full"></div>
-                    </>
-                  )}
-                </motion.button>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Hero Section - Updated with OPay green */}
-          <div className="mb-8">
-            <div className="bg-[#1EB53A] rounded-2xl p-8 text-white overflow-hidden relative">
-              <div className="absolute inset-0 bg-black/10"></div>
-              <div className="relative z-10 max-w-2xl">
-                <h2 className="text-3xl font-bold mb-4">Find the Perfect Nigerian Gift 🎁</h2>
-                <p className="text-white/90 mb-6">
-                  From spicy suya to beautiful Ankara, discover thoughtful gifts that celebrate Nigerian culture.
-                  Perfect for birthdays, weddings, and special occasions.
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5" />
-                    <span>Fast Delivery</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-5 h-5" />
-                    <span>Secure Payments</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Globe className="w-5 h-5" />
-                    <span>Nationwide</span>
-                  </div>
-                </div>
-              </div>
-              <div className="absolute right-8 top-1/2 transform -translate-y-1/2 hidden lg:block">
-                <div className="w-64 h-64 bg-white/10 rounded-full"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar Filters */}
-            <div className="lg:w-64 shrink-0">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-24">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                    <Filter className="w-4 h-4" />
-                    Filters
-                  </h3>
-                  <button
-                    onClick={() => {
-                      setSelectedCategory('all');
-                      setPriceRange([0, 1000000]);
-                      setSelectedPriceRange('all');
-                      setSelectedTags([]);
-                      setBudget(null);
-                    }}
-                    className="text-sm text-[#1EB53A] hover:text-[#189531]"
+                  <Wallet className="w-4 h-4" />
+                  <span className="font-medium">Budget</span>
+                </button>
+                {showBudgetInput && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center gap-2"
                   >
-                    Clear all
-                  </button>
-                </div>
-
-                {/* Price Range */}
-                <div className="mb-6">
-                  <h4 className="font-semibold text-gray-700 mb-3">Price Range</h4>
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="priceRange"
-                        checked={selectedPriceRange === "all"}
-                        onChange={() => {
-                          setSelectedPriceRange("all");
-                          setPriceRange([0, 1000000]);
-                        }}
-                        className="text-[#1EB53A] focus:ring-[#1EB53A]"
-                      />
-                      <span className="text-sm text-gray-600">All Prices</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="priceRange"
-                        checked={selectedPriceRange === "Under ₦5,000"}
-                        onChange={() => {
-                          setSelectedPriceRange("Under ₦5,000");
-                          setPriceRange([0, 5000]);
-                        }}
-                        className="text-[#1EB53A] focus:ring-[#1EB53A]"
-                      />
-                      <span className="text-sm text-gray-600">Under ₦5,000</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="priceRange"
-                        checked={selectedPriceRange === "₦5,000 - ₦15,000"}
-                        onChange={() => {
-                          setSelectedPriceRange("₦5,000 - ₦15,000");
-                          setPriceRange([5000, 15000]);
-                        }}
-                        className="text-[#1EB53A] focus:ring-[#1EB53A]"
-                      />
-                      <span className="text-sm text-gray-600">₦5,000 - ₦15,000</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="priceRange"
-                        checked={selectedPriceRange === "₦15,000 - ₦30,000"}
-                        onChange={() => {
-                          setSelectedPriceRange("₦15,000 - ₦30,000");
-                          setPriceRange([15000, 30000]);
-                        }}
-                        className="text-[#1EB53A] focus:ring-[#1EB53A]"
-                      />
-                      <span className="text-sm text-gray-600">₦15,000 - ₦30,000</span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Tags Filter */}
-                <div className="mb-6">
-                  <h4 className="font-semibold text-gray-700 mb-3">Tags</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {allTags.slice(0, 10).map(tag => (
+                    <input
+                      type="number"
+                      placeholder="₦ Max"
+                      value={budget || ''}
+                      onChange={(e) => setBudget(e.target.value ? Number(e.target.value) : null)}
+                      className="w-32 px-3 py-2 border text-gray-800 border-[#1EB53A]/30 rounded-xl focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent"
+                    />
+                    {budget && (
                       <button
-                        key={tag}
-                        onClick={() => {
-                          setSelectedTags(prev =>
-                            prev.includes(tag)
-                              ? prev.filter(t => t !== tag)
-                              : [...prev, tag]
-                          );
-                        }}
-                        className={`px-3 py-1.5 rounded-full text-sm transition-all ${
-                          selectedTags.includes(tag)
-                            ? 'bg-[#1EB53A] text-white'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
+                        onClick={() => setBudget(null)}
+                        className="p-1 hover:bg-[#1EB53A]/10 rounded-lg"
                       >
-                        {tag}
+                        <X className="w-4 h-4 text-gray-600" />
                       </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Features Filter */}
-                <div className="space-y-3">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedTags.includes('local')}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedTags(prev => [...prev, 'local', 'handmade']);
-                        } else {
-                          setSelectedTags(prev => prev.filter(t => !['local', 'handmade'].includes(t)));
-                        }
-                      }}
-                      className="rounded border-gray-300 text-[#1EB53A] focus:ring-[#1EB53A]"
-                    />
-                    <span className="text-sm text-gray-600">Local & Handmade</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedTags.includes('eco')}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedTags(prev => [...prev, 'eco', 'sustainable']);
-                        } else {
-                          setSelectedTags(prev => prev.filter(t => !['eco', 'sustainable'].includes(t)));
-                        }
-                      }}
-                      className="rounded border-gray-300 text-[#1EB53A] focus:ring-[#1EB53A]"
-                    />
-                    <span className="text-sm text-gray-600">Eco-friendly</span>
-                  </label>
-                </div>
+                    )}
+                  </motion.div>
+                )}
               </div>
-            </div>
 
-            {/* Main Content Area */}
-            <div className="flex-1">
-              {/* Search and Sort Bar */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
-                <div className="flex flex-col lg:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="text"
-                      placeholder="Search gifts by name, category, or tag..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full text-gray-700 pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent"
-                    />
+              {/* View Toggle */}
+              <div className="hidden md:flex items-center ${theme.bg.green} p-1 rounded-xl border border-[#1EB53A]/30">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[#1EB53A] text-white shadow-sm' : 'text-[#1EB53A] hover:bg-[#1EB53A]/20'}`}
+                >
+                  <div className="w-4 h-4">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="3" width="7" height="7" rx="1" />
+                      <rect x="14" y="3" width="7" height="7" rx="1" />
+                      <rect x="3" y="14" width="7" height="7" rx="1" />
+                      <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="bg-gray-50 text-gray-700 border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent appearance-none pr-10"
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[#1EB53A] text-white shadow-sm' : 'text-[#1EB53A] hover:bg-[#1EB53A]/20'}`}
+                >
+                  <div className="w-4 h-4">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="8" y1="6" x2="21" y2="6" />
+                      <line x1="8" y1="12" x2="21" y2="12" />
+                      <line x1="8" y1="18" x2="21" y2="18" />
+                      <line x1="3" y1="6" x2="3.01" y2="6" />
+                      <line x1="3" y1="12" x2="3.01" y2="12" />
+                      <line x1="3" y1="18" x2="3.01" y2="18" />
+                    </svg>
+                  </div>
+                </button>
+              </div>
+
+              {/* Cart with animation */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowCart(true)}
+                className={`relative p-3 ${theme.bg.green} rounded-xl hover:shadow-md transition-all border border-[#1EB53A]/30`}
+              >
+                <ShoppingCart className="w-5 h-5 text-[#1EB53A]" />
+                {cart.length > 0 && (
+                  <>
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 bg-[#1EB53A] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
                     >
-                      {sortOptions.map(option => (
-                        <option key={option.id} value={option.id}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-gray-400 -ml-8 pointer-events-none" />
-                  </div>
-                </div>
+                      {cart.reduce((sum, item) => sum + item.quantity, 0)}
+                    </motion.span>
+                    <div className="absolute -bottom-1 inset-x-0 h-1 bg-[#1EB53A] rounded-full"></div>
+                  </>
+                )}
+              </motion.button>
+            </div>
+          </div>
+        </div>
+      </header>
 
-                {/* Category Chips - Updated with OPay colors */}
-                <div className="flex flex-wrap gap-2 mt-6">
-                  {categories.map(category => {
-                    const Icon = category.icon;
-                    return (
-                      <button
-                        key={category.id}
-                        onClick={() => setSelectedCategory(category.id)}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
-                          selectedCategory === category.id
-                            ? 'bg-[#1EB53A] text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span className="font-medium">{category.name}</span>
-                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                          selectedCategory === category.id
-                            ? 'bg-white/20'
-                            : 'bg-gray-200 text-gray-700'
-                        }`}>
-                          {nigerianGifts.filter(g => 
-                            category.id === 'all' || g.category === category.id
-                          ).length}
-                        </span>
-                      </button>
-                    );
-                  })}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero Section - Updated to match GiftSchedulingModal */}
+        <div className="mb-8">
+          <div className="bg-linear-to-r bg-[#1EB53A] rounded-xl p-8 text-white overflow-hidden relative shadow-sm">
+            <div className="absolute inset-0 bg-black/10"></div>
+            <div className="relative z-10 max-w-2xl">
+              <h2 className="text-3xl font-bold mb-4">Find the Perfect Nigerian Gift 🎁</h2>
+              <p className="text-white/90 mb-6">
+                From spicy suya to beautiful Ankara, discover thoughtful gifts that celebrate Nigerian culture.
+                Perfect for birthdays, weddings, and special occasions.
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5" />
+                  <span>Fast Delivery</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  <span>Secure Payments</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Globe className="w-5 h-5" />
+                  <span>Nationwide</span>
                 </div>
               </div>
-
-              {/* Stats Bar - Updated with OPay colors */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                      <Package className="w-5 h-5 text-gray-700" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Total Gifts</p>
-                      <p className="text-xl font-bold text-gray-900">{filteredGifts.length}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-[#1EB53A]" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Popular Today</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        {filteredGifts.filter(g => g.popular).length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center">
-                      <Zap className="w-5 h-5 text-[#1EB53A]" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Fast Delivery</p>
-                      <p className="text-xl font-bold text-gray-900">Same schedule Day</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center">
-                      <Crown className="w-5 h-5 text-[#1EB53A]" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Top Rated</p>
-                      <p className="text-xl font-bold text-gray-900">
-                        {filteredGifts.filter(g => g.rating >= 4.5).length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Gifts Grid/List */}
-              {filteredGifts.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-                  <Gift className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-700 mb-2">No gifts found</h3>
-                  <p className="text-gray-500 mb-6">Try adjusting your filters or search term</p>
-                  <button
-                    onClick={() => {
-                      setSearchTerm('');
-                      setSelectedCategory('all');
-                      setSelectedTags([]);
-                      setBudget(null);
-                    }}
-                    className="px-6 py-3 bg-[#1EB53A] text-white rounded-xl font-semibold hover:bg-[#189531] hover:shadow-lg transition-all"
-                  >
-                    Reset Filters
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className={`${
-                    viewMode === 'grid' 
-                      ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                      : 'space-y-4'
-                  } gap-6 mb-8`}>
-                    <AnimatePresence>
-                      {filteredGifts.map((gift, index) => (
-                        <GiftCard
-                          key={gift.id}
-                          gift={gift}
-                          index={index}
-                          viewMode={viewMode}
-                          wishlist={wishlist}
-                          onAddToCart={handleAddToCart}
-                          onToggleWishlist={(id) => {
-                            setWishlist(prev =>
-                              prev.includes(id)
-                                ? prev.filter(giftId => giftId !== id)
-                                : [...prev, id]
-                            );
-                          }}
-                          onQuickView={handleQuickView}
-                        />
-                      ))}
-                    </AnimatePresence>
-                  </div>
-
-                  {/* Recommendations */}
-                  {recommendedGifts.length > 0 && (
-                    <div className="mt-12">
-                      <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-bold text-gray-900">
-                          Recommended for you
-                        </h3>
-                        <div className="flex items-center gap-2 text-[#1EB53A]">
-                          <Target className="w-4 h-4" />
-                          <span className="text-sm font-medium">Based on your cart</span>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {recommendedGifts.map(gift => (
-                          <motion.div
-                            key={gift.id}
-                            whileHover={{ y: -4 }}
-                            className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-all"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center">
-                                <Gift className="w-5 h-5 text-gray-600" />
-                              </div>
-                              <div>
-                                <h4 className="font-semibold text-gray-900 line-clamp-1">
-                                  {gift.name}
-                                </h4>
-                                <p className="text-sm text-[#1EB53A] font-bold">
-                                  ₦{gift.price.toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => handleAddToCart(gift)}
-                              className="w-full mt-3 py-2 bg-[#1EB53A] text-white rounded-lg font-medium hover:bg-[#189531] transition-colors"
-                            >
-                              Add to Cart
-                            </button>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
+            </div>
+            <div className="absolute right-8 top-1/2 transform -translate-y-1/2 hidden lg:block">
+              <div className="w-64 h-64 bg-white/10 rounded-full"></div>
             </div>
           </div>
         </div>
 
-        {/* Quick View Modal */}
-        <AnimatePresence>
-          {quickViewGift && (
-            <QuickViewModal
-              gift={quickViewGift}
-              onClose={() => setQuickViewGift(null)}
-              onAddToCart={handleAddToCart}
-              wishlist={wishlist}
-              onToggleWishlist={(id) => {
-                setWishlist(prev =>
-                  prev.includes(id)
-                    ? prev.filter(giftId => giftId !== id)
-                    : [...prev, id]
-                );
-              }}
-            />
-          )}
-        </AnimatePresence>
+        {/* Main Content */}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar Filters */}
+          <div className="lg:w-64 shrink-0">
+            <div className={`${theme.bg.card} rounded-xl shadow-sm border ${theme.border.primary} p-6 sticky top-24`}>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className={`font-bold ${theme.text.primary} flex items-center gap-2`}>
+                  <Filter className="w-4 h-4" />
+                  Filters
+                </h3>
+                <button
+                  onClick={() => {
+                    setSelectedCategory('all');
+                    setPriceRange([0, 1000000]);
+                    setSelectedPriceRange('all');
+                    setSelectedTags([]);
+                    setBudget(null);
+                  }}
+                  className="text-sm text-[#1EB53A] hover:text-[#189531]"
+                >
+                  Clear all
+                </button>
+              </div>
 
-        {/* Cart Sidebar */}
-        <AnimatePresence>
-          {showCart && (
-            <EnhancedCartSidebar
-              cart={cart}
-              setCart={setCart}
-              cartTotal={cartTotal}
-              onClose={() => setShowCart(false)}
-              onSchedule={handleScheduleGift}
-              recommendedGifts={recommendedGifts}
-              onAddRecommendation={handleAddToCart}
-            />
-          )}
-        </AnimatePresence>
+              {/* Price Range */}
+              <div className="mb-6">
+                <h4 className={`font-semibold ${theme.text.primary} mb-3`}>Price Range</h4>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="priceRange"
+                      checked={selectedPriceRange === "all"}
+                      onChange={() => {
+                        setSelectedPriceRange("all");
+                        setPriceRange([0, 1000000]);
+                      }}
+                      className="text-[#1EB53A] focus:ring-[#1EB53A]"
+                    />
+                    <span className={`text-sm ${theme.text.secondary}`}>All Prices</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="priceRange"
+                      checked={selectedPriceRange === "Under ₦5,000"}
+                      onChange={() => {
+                        setSelectedPriceRange("Under ₦5,000");
+                        setPriceRange([0, 5000]);
+                      }}
+                      className="text-[#1EB53A] focus:ring-[#1EB53A]"
+                    />
+                    <span className={`text-sm ${theme.text.secondary}`}>Under ₦5,000</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="priceRange"
+                      checked={selectedPriceRange === "₦5,000 - ₦15,000"}
+                      onChange={() => {
+                        setSelectedPriceRange("₦5,000 - ₦15,000");
+                        setPriceRange([5000, 15000]);
+                      }}
+                      className="text-[#1EB53A] focus:ring-[#1EB53A]"
+                    />
+                    <span className={`text-sm ${theme.text.secondary}`}>₦5,000 - ₦15,000</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="priceRange"
+                      checked={selectedPriceRange === "₦15,000 - ₦30,000"}
+                      onChange={() => {
+                        setSelectedPriceRange("₦15,000 - ₦30,000");
+                        setPriceRange([15000, 30000]);
+                      }}
+                      className="text-[#1EB53A] focus:ring-[#1EB53A]"
+                    />
+                    <span className={`text-sm ${theme.text.secondary}`}>₦15,000 - ₦30,000</span>
+                  </label>
+                </div>
+              </div>
 
-        {/* Gift Scheduling Modal */}
-        <AnimatePresence>
-          {showScheduleModal && (
-            <GiftSchedulingModal
-              isOpen={showScheduleModal}
-              onClose={() => setShowScheduleModal(false)}
-              onSuccess={handleScheduleSuccess}
-              cartItems={cart}
-              cartTotal={cartTotal}
-              giftWrapCost={giftWrapCost}
-              mediaCaptureCost={includeMediaCapture ? 10000 : 0}
-            />
-          )}
-        </AnimatePresence>
+              {/* Tags Filter */}
+              <div className="mb-6">
+                <h4 className={`font-semibold ${theme.text.primary} mb-3`}>Tags</h4>
+                <div className="flex flex-wrap gap-2">
+                  {allTags.slice(0, 10).map(tag => (
+                    <button
+                      key={tag}
+                      onClick={() => {
+                        setSelectedTags(prev =>
+                          prev.includes(tag)
+                            ? prev.filter(t => t !== tag)
+                            : [...prev, tag]
+                        );
+                      }}
+                      className={`px-3 py-1.5 rounded-full text-sm transition-all ${
+                        selectedTags.includes(tag)
+                          ? 'bg-[#1EB53A] text-white'
+                          : 'bg-[#1EB53A]/10 text-[#1EB53A] hover:bg-[#1EB53A]/20 border border-[#1EB53A]/30'
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Features Filter */}
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={selectedTags.includes('local')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedTags(prev => [...prev, 'local', 'handmade']);
+                      } else {
+                        setSelectedTags(prev => prev.filter(t => !['local', 'handmade'].includes(t)));
+                      }
+                    }}
+                    className="rounded border-gray-300 text-[#1EB53A] focus:ring-[#1EB53A]"
+                  />
+                  <span className={`text-sm ${theme.text.secondary}`}>Local & Handmade</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={selectedTags.includes('eco')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedTags(prev => [...prev, 'eco', 'sustainable']);
+                      } else {
+                        setSelectedTags(prev => prev.filter(t => !['eco', 'sustainable'].includes(t)));
+                      }
+                    }}
+                    className="rounded border-gray-300 text-[#1EB53A] focus:ring-[#1EB53A]"
+                  />
+                  <span className={`text-sm ${theme.text.secondary}`}>Eco-friendly</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex-1">
+            {/* Search and Sort Bar */}
+            <div className={`${theme.bg.card} rounded-xl shadow-sm border ${theme.border.primary} p-6 mb-6`}>
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Search gifts by name, category, or tag..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={`w-full text-gray-700 pl-12 pr-4 py-3 ${theme.bg.gray} border border-[#1EB53A]/30 rounded-xl focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent`}
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className={`${theme.bg.gray} text-gray-700 border border-[#1EB53A]/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#1EB53A] focus:border-transparent appearance-none pr-10`}
+                  >
+                    {sortOptions.map(option => (
+                      <option key={option.id} value={option.id}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-gray-400 -ml-8 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Category Chips - Updated to match GiftSchedulingModal */}
+              <div className="flex flex-wrap gap-2 mt-6">
+                {categories.map(category => {
+                  const Icon = category.icon;
+                  return (
+                    <button
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.id)}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
+                        selectedCategory === category.id
+                          ? 'bg-linear-to-r from-[#1EB53A] to-[#16A34A] text-white shadow-sm'
+                          : 'bg-[#1EB53A]/10 text-[#1EB53A] hover:bg-[#1EB53A]/20 border border-[#1EB53A]/30'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="font-medium">{category.name}</span>
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                        selectedCategory === category.id
+                          ? 'bg-white/20'
+                          : 'bg-[#1EB53A]/20 text-[#1EB53A]'
+                      }`}>
+                        {nigerianGifts.filter(g => 
+                          category.id === 'all' || g.category === category.id
+                        ).length}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Stats Bar - Updated to match GiftSchedulingModal */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className={`${theme.bg.card} p-4 rounded-xl border border-[#1EB53A]/30 shadow-sm`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center border border-[#1EB53A]/30">
+                    <Package className="w-5 h-5 text-[#1EB53A]" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-800 ">Total Gifts</p>
+                    <p className={`text-xl  font-bold ${theme.text.primary}`}>{filteredGifts.length}</p>
+                  </div>
+                </div>
+              </div>
+              <div className={`${theme.bg.card} p-4 rounded-xl border border-[#1EB53A]/30 shadow-sm`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center border border-[#1EB53A]/30">
+                    <TrendingUp className="w-5 h-5 text-[#1EB53A]" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-800">Popular Today</p>
+                    <p className={`text-xl font-bold ${theme.text.primary}`}>
+                      {filteredGifts.filter(g => g.popular).length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className={`${theme.bg.card} p-4 rounded-xl border border-[#1EB53A]/30 shadow-sm`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center border border-[#1EB53A]/30">
+                    <Zap className="w-5 h-5 text-[#1EB53A]" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-800">Fast Delivery</p>
+                    <p className={`text-xl font-bold ${theme.text.primary}`}>Same schedule Day</p>
+                  </div>
+                </div>
+              </div>
+              <div className={`${theme.bg.card} p-4 rounded-xl border border-[#1EB53A]/30 shadow-sm`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#1EB53A]/10 rounded-xl flex items-center justify-center border border-[#1EB53A]/30">
+                    <Crown className="w-5 h-5 text-[#1EB53A]" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-800">Top Rated</p>
+                    <p className={`text-xl font-bold ${theme.text.primary}`}>
+                      {filteredGifts.filter(g => g.rating >= 4.5).length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Gifts Grid/List */}
+            {filteredGifts.length === 0 ? (
+              <div className={`${theme.bg.card} rounded-xl border border-[#1EB53A]/30 p-12 text-center`}>
+                <Gift className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className={`text-xl font-bold ${theme.text.primary} mb-2`}>No gifts found</h3>
+                <p className={`${theme.text.muted} mb-6`}>Try adjusting your filters or search term</p>
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSelectedCategory('all');
+                    setSelectedTags([]);
+                    setBudget(null);
+                  }}
+                  className="px-6 py-3 bg-linear-to-r from-[#1EB53A] to-[#16A34A] text-white rounded-xl font-semibold hover:shadow-md transition-all shadow-sm"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className={`${
+                  viewMode === 'grid' 
+                    ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                    : 'space-y-4'
+                } gap-6 mb-8`}>
+                  <AnimatePresence>
+                    {filteredGifts.map((gift, index) => (
+                      <GiftCard
+                        key={gift.id}
+                        gift={gift}
+                        index={index}
+                        viewMode={viewMode}
+                        wishlist={wishlist}
+                        onAddToCart={handleAddToCart}
+                        onToggleWishlist={(id) => {
+                          setWishlist(prev =>
+                            prev.includes(id)
+                              ? prev.filter(giftId => giftId !== id)
+                              : [...prev, id]
+                          );
+                        }}
+                        onQuickView={handleQuickView}
+                      />
+                    ))}
+                  </AnimatePresence>
+                </div>
+
+                {/* Recommendations */}
+                {recommendedGifts.length > 0 && (
+                  <div className="mt-12">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className={`text-xl font-bold ${theme.text.primary}`}>
+                        Recommended for you
+                      </h3>
+                      <div className="flex items-center gap-2 text-[#1EB53A]">
+                        <Target className="w-4 h-4" />
+                        <span className="text-sm font-medium">Based on your cart</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {recommendedGifts.map(gift => (
+                        <motion.div
+                          key={gift.id}
+                          whileHover={{ y: -4 }}
+                          className={`${theme.bg.card} rounded-xl border border-[#1EB53A]/30 p-4 hover:shadow-md transition-all`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-[#1EB53A]/10 rounded-lg flex items-center justify-center border border-[#1EB53A]/30">
+                              <Gift className="w-5 h-5 text-[#1EB53A]" />
+                            </div>
+                            <div>
+                              <h4 className={`font-semibold ${theme.text.primary} line-clamp-1`}>
+                                {gift.name}
+                              </h4>
+                              <p className={`text-sm text-[#1EB53A] font-bold`}>
+                                ₦{gift.price.toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleAddToCart(gift)}
+                            className={`w-full mt-3 py-2 bg-linear-to-r bg-[#1EB53A] text-white rounded-lg font-medium hover:shadow-md transition-colors shadow-sm`}
+                          >
+                            Add to Cart
+                          </button>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
-    </>
+
+      {/* Quick View Modal */}
+      <AnimatePresence>
+        {quickViewGift && (
+          <QuickViewModal
+            gift={quickViewGift}
+            onClose={() => setQuickViewGift(null)}
+            onAddToCart={handleAddToCart}
+            wishlist={wishlist}
+            onToggleWishlist={(id) => {
+              setWishlist(prev =>
+                prev.includes(id)
+                  ? prev.filter(giftId => giftId !== id)
+                  : [...prev, id]
+              );
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Cart Sidebar */}
+      <AnimatePresence>
+        {showCart && (
+          <EnhancedCartSidebar
+            cart={cart}
+            setCart={setCart}
+            cartTotal={cartTotal}
+            onClose={() => setShowCart(false)}
+            onSchedule={handleScheduleGift}
+            recommendedGifts={recommendedGifts}
+            onAddRecommendation={handleAddToCart}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Gift Scheduling Modal */}
+      <AnimatePresence>
+        {showScheduleModal && (
+          <GiftSchedulingModal
+            isOpen={showScheduleModal}
+            onClose={() => setShowScheduleModal(false)}
+            onSuccess={handleScheduleSuccess}
+            cartItems={cart}
+            cartTotal={cartTotal}
+            giftWrapCost={giftWrapCost}
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

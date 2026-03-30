@@ -1,8 +1,7 @@
 // app/api/scheduled-gifts/route.js
-// This is the API route for fetching scheduled gifts by customer email
-
-import { NextResponse } from 'next/server';
-import { getScheduledGiftsByEmail } from '../../../lib/scheduledGifts';
+import { NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb";
+import ScheduledGift from "@/models/ScheduledGift"; // Make sure you have this model
 
 export async function GET(request) {
   try {
@@ -11,22 +10,27 @@ export async function GET(request) {
     
     if (!email) {
       return NextResponse.json(
-        { success: false, message: 'Email parameter is required' },
+        { success: false, error: 'Email is required' },
         { status: 400 }
       );
     }
-
-    const gifts = await getScheduledGiftsByEmail(email);
+    
+    await connectDB();
+    
+    // Find gifts for this user
+    const gifts = await ScheduledGift.find({ userEmail: email })
+      .sort({ scheduledDate: 1 })
+      .lean();
     
     return NextResponse.json({
       success: true,
-      gifts: gifts
+      gifts: gifts || []
     });
     
   } catch (error) {
-    console.error('Error fetching scheduled gifts:', error);
+    console.error("Error fetching scheduled gifts:", error);
     return NextResponse.json(
-      { success: false, message: error.message },
+      { success: false, error: 'Failed to fetch scheduled gifts' },
       { status: 500 }
     );
   }

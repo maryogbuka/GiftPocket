@@ -1,75 +1,46 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+// app/api/wallet/balance/route.js
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
 import { authOptions } from "@/lib/auth-options";
-import { connectDB } from "../../../../lib/mongodb";
-import Wallet from "../../../../models/Wallet";
-import Transaction from "../../../../models/Transaction";
+import { connectDB } from "@/lib/mongodb";
+import User from "@/models/User";
 
 export async function GET(request) {
   try {
-    // --------------------------
-    // 1️⃣ Get logged-in user
-    // --------------------------
+    console.log('💰 Wallet balance API called');
+    
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    
+    if (!session?.user?.email) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized. Please log in." },
+        { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
-
-    const userId = session.user.id;
-
-    // --------------------------
-    // 2️⃣ Connect to DB
-    // --------------------------
+    
     await connectDB();
-
-    // --------------------------
-    // 3️⃣ Get wallet
-    // --------------------------
-    const wallet = await Wallet.findOne({ userId });
-
-    if (!wallet) {
-      return NextResponse.json({
-        success: true,
-        balance: 0,
-        walletId: null,
-        transactions: []
-      });
+    
+    const user = await User.findOne({ email: session.user.email });
+    
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'User not found' },
+        { status: 404 }
+      );
     }
-
-    // --------------------------
-    // 4️⃣ Get recent transactions (limit 10)
-    // --------------------------
-    const transactions = await Transaction.find({ walletId: wallet._id })
-      .sort({ createdAt: -1 })
-      .limit(10)
-      .select('amount type description status createdAt category')
-      .lean(); // faster and returns plain objects
-
-    // --------------------------
-    // 5️⃣ Return clean JSON
-    // --------------------------
+    
+    console.log('✅ User found, wallet balance:', user.walletBalance);
+    
     return NextResponse.json({
       success: true,
-      balance: wallet.balance,
-        walletId: wallet.walletId,
-      transactions: transactions.map(t => ({
-        id: t._id,
-        amount: t.amount,
-        type: t.type,
-        description: t.description,
-        status: t.status,
-        date: t.createdAt,
-        category: t.category
-      }))
+      balance: user.walletBalance || 0,
+      currency: 'NGN'
     });
-
+    
   } catch (error) {
-    console.error("❌ Get wallet error:", error);
+    console.error('Wallet balance API error:', error);
     return NextResponse.json(
-      { success: false, error: "Failed to fetch wallet data", details: error.message },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }

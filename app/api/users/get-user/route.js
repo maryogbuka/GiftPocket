@@ -1,7 +1,7 @@
 // app/api/users/get-user/route.js
 import { NextResponse } from "next/server";
-import User from "../../../../models/User"; // your User model
-import { connectDB } from "../../../../lib/mongodb";
+import User from "@/models/User"; // your User model
+import { connectDB } from "@/lib/mongodb";
 
 export async function POST(req) {
   try {
