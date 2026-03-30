@@ -223,7 +223,7 @@ export default function TransactionHistory({ limit = 10 }) {
           </div>
         </div>
       </div>
-
+      
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-3 mb-6">
         <div className="relative flex-1">
