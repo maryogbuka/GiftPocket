@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-export async function middleware(request) {
+export async function proxy (request) {
   const { pathname } = request.nextUrl;
   
   // Create response
@@ -16,8 +16,7 @@ export async function middleware(request) {
   // CORS headers for API routes
   if (pathname.startsWith('/api')) {
     response.headers.set('Access-Control-Allow-Credentials', 'true');
-    response.headers.set('Access-Control-Allow-Origin', '*'); // Change to your domain in production
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Origin', 'https://giftpocket.ng');    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
     // Handle preflight requests

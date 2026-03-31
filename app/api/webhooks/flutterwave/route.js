@@ -4,7 +4,7 @@ import { connectDB } from "@/lib/mongodb";
 import Transaction from "@/models/Transaction";
 import Wallet from "@/models/Wallet";
 import VirtualAccount from "@/models/VirtualAccount";
-import { sendNotification } from "@/lib/notification-service";
+import sendNotification  from "@/lib/notificationService";
 
 // Simple Flutterwave signature verification
 function verifyWebhookSignature(signature, secret) {
@@ -63,7 +63,7 @@ async function handleVirtualAccountCredit(data) {
   await wallet.save();
 
   // Notify user
-  await sendNotification({
+  await NotificationService ({
     userId: virtualAccount.userId,
     type: "wallet_credit",
     title: "Wallet Credited",

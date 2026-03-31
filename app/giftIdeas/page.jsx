@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react"; // Remove useEffect import
+import { useState } from "react"; 
 import { 
   Gift, Heart, ShoppingCart, Filter, Search, 
   Star, Users, Lightbulb, Sparkles, MessageCircle,
@@ -8,7 +8,6 @@ import {
   BookOpen, Palette, ChefHat, Briefcase, Smile
 } from "lucide-react";
 
-// Real gift categories people actually search for
 const REAL_CATEGORIES = [
   { id: "all", name: "Everything", count: 48, icon: Gift },
   { id: "tech", name: "Tech & Gadgets", count: 14, icon: Briefcase },
@@ -22,7 +21,6 @@ const REAL_CATEGORIES = [
   { id: "books", name: "Bookworms", count: 3, icon: BookOpen }
 ];
 
-// Actual gifts people might actually buy (with real-ish prices)
 const REAL_GIFTS = [
   {
     id: 101,
@@ -176,7 +174,6 @@ const REAL_GIFTS = [
   }
 ];
 
-// Helper function to match words naturally (not just exact matches)
 const fuzzyMatch = (text, searchTerms) => {
   if (!text || !searchTerms) return 0;
   
@@ -187,7 +184,6 @@ const fuzzyMatch = (text, searchTerms) => {
     if (textLower.includes(term)) {
       score += 2;
     } else if (term.length > 3) {
-      // Partial match for longer words
       for (let i = 0; i < term.length - 2; i++) {
         const snippet = term.substring(i, i + 3);
         if (textLower.includes(snippet)) {
@@ -202,12 +198,10 @@ const fuzzyMatch = (text, searchTerms) => {
 };
 
 export default function GiftFinder() {
-  // Using more natural state names
-  const [currentView, setCurrentView] = useState("describe"); // "describe" or "browse"
+  const [currentView, setCurrentView] = useState("describe");
   const [selectedType, setSelectedType] = useState("all");
   const [priceLimit, setPriceLimit] = useState(50000);
   
-  // Person description with friendlier fields
   const [aboutThem, setAboutThem] = useState({
     age: "",
     whatTheyLike: "",
@@ -219,18 +213,10 @@ export default function GiftFinder() {
     extraNotes: ""
   });
 
-    const filledFields = Object.values(aboutThem).filter(val => 
+  // Compute filledFields directly - no useEffect needed
+  const filledFields = Object.values(aboutThem).filter(val => 
     val && val.trim().length > 0
   ).length;
-  
-
-  useEffect(() => {
-    const count = Object.values(aboutThem).filter(val => 
-      val && val.trim().length > 0
-    ).length;
-    setFilledFields(count);
-  }, [aboutThem]);
-  
 
   const updateAboutThem = (field, value) => {
     setAboutThem(prev => ({
@@ -239,7 +225,6 @@ export default function GiftFinder() {
     }));
   };
   
-  // Clear form
   const startOver = () => {
     setAboutThem({
       age: "",
@@ -253,14 +238,11 @@ export default function GiftFinder() {
     });
   };
   
-
   const findGoodFits = () => {
-
     if (filledFields < 2) {
       return REAL_GIFTS.filter(g => g.rating >= 4.5).slice(0, 9);
     }
     
-
     const searchTerms = [];
     
     if (aboutThem.whatTheyLike) {
@@ -279,42 +261,35 @@ export default function GiftFinder() {
       searchTerms.push(aboutThem.job.toLowerCase());
     }
     
-
     const scoredGifts = REAL_GIFTS.map(gift => {
       let matchScore = 0;
       
-
       matchScore += fuzzyMatch(gift.description, searchTerms) * 2;
       matchScore += fuzzyMatch(gift.tags.join(' '), searchTerms) * 3;
       matchScore += fuzzyMatch(gift.perfectFor.join(' '), searchTerms) * 1.5;
       
-
       if (aboutThem.myBudget) {
         const budget = parseInt(aboutThem.myBudget);
         if (!isNaN(budget)) {
-
           const priceDiff = Math.abs(budget - gift.price);
           if (priceDiff < budget * 0.3) {
             matchScore += 2;
           }
           if (gift.price <= budget) {
-            matchScore += 1; 
+            matchScore += 1;
           }
         }
       }
       
-
       if (aboutThem.age) {
         const age = parseInt(aboutThem.age);
         if (!isNaN(age)) {
-
           if (age < 25 && gift.tags.includes("students")) matchScore += 1;
           if (age > 30 && gift.tags.includes("home")) matchScore += 1;
           if (age > 40 && gift.tags.includes("experience")) matchScore += 0.5;
         }
       }
       
-
       if (gift.rating > 4.7) matchScore += 1;
       
       return {
@@ -324,12 +299,11 @@ export default function GiftFinder() {
     })
     .filter(gift => gift.matchScore > 0)
     .sort((a, b) => b.matchScore - a.matchScore)
-    .slice(0, 12); 
+    .slice(0, 12);
     
     return scoredGifts;
   };
   
-
   const giftsToShow = currentView === "describe" 
     ? findGoodFits()
     : REAL_GIFTS.filter(gift => {
@@ -338,8 +312,7 @@ export default function GiftFinder() {
         return typeMatch && priceMatch;
       });
   
-
-      const getConfidenceLevel = () => {
+  const getConfidenceLevel = () => {
     if (filledFields >= 5) return "high";
     if (filledFields >= 3) return "medium";
     return "low";
@@ -348,7 +321,6 @@ export default function GiftFinder() {
   return (
     <div className="min-h-screen bg-linear-to-b from-gray-50 to-white p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header with personality */}
         <header className="mb-10">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-purple-100 rounded-lg">
@@ -364,7 +336,6 @@ export default function GiftFinder() {
             </div>
           </div>
           
-          {/* Progress indicator for describe mode */}
           {currentView === "describe" && filledFields > 0 && (
             <div className="mt-4">
               <div className="flex items-center justify-between text-sm mb-1">
@@ -383,11 +354,8 @@ export default function GiftFinder() {
           )}
         </header>
         
-        {/* Main content area */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left sidebar */}
           <div className="lg:w-1/3">
-            {/* View switcher */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-6">
               <div className="flex border-b border-gray-200">
                 <button
@@ -418,7 +386,6 @@ export default function GiftFinder() {
                 </button>
               </div>
               
-              {/* Form based on view */}
               <div className="p-6">
                 {currentView === "describe" ? (
                   <div className="space-y-4">
@@ -562,7 +529,6 @@ export default function GiftFinder() {
               </div>
             </div>
             
-            {/* Help tip */}
             <div className="bg-linear-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl p-4">
               <div className="flex items-start gap-3">
                 <Lightbulb className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
@@ -576,9 +542,7 @@ export default function GiftFinder() {
             </div>
           </div>
           
-          {/* Right content - Gift display */}
           <div className="lg:w-2/3">
-            {/* Results header */}
             <div className="mb-6">
               {currentView === "describe" ? (
                 <div>
@@ -605,7 +569,6 @@ export default function GiftFinder() {
                     )}
                   </div>
                   
-                  {/* Confidence indicator */}
                   {filledFields >= 2 && (
                     <div className="flex items-center gap-2 text-sm mb-6">
                       <div className={`px-3 py-1 rounded-full ${
@@ -640,7 +603,6 @@ export default function GiftFinder() {
               )}
             </div>
             
-            {/* Gift grid */}
             {giftsToShow.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                 {giftsToShow.map((gift, index) => (
@@ -741,7 +703,6 @@ export default function GiftFinder() {
               </div>
             )}
             
-            {/* Footer note */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <p className="text-sm text-gray-500 text-center">
                 All prices in Nigerian Naira. Delivery times may vary.

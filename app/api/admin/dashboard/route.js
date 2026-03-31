@@ -4,7 +4,7 @@ import { connectDB } from "@/lib/mongodb";
 import Order from "@/models/Order";
 import User from "@/models/User";
 import Gift from "@/models/Gift";
-import { adminAuthMiddleware } from "@/middleware/admin-auth";
+import { adminAuthMiddleware } from "@/app/middleware/admin-auth";
 
 export async function GET(request) {
   try {

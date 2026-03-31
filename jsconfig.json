@@ -6,6 +6,6 @@
       "@/*": ["./*"]  // This makes @ point to ./app directory
     }
   },
-  "include": ["app/**/*", "lib", "models"],
+  "include": ["app/**/*", "lib", "models", "app/middleware"],
   "exclude": ["node_modules"]
 }

@@ -40,7 +40,7 @@ const transactionSchema = new mongoose.Schema({
   reference: {
     type: String,
     required: true,
-    unique: true,
+    unique: true, // This automatically creates an index - REMOVED the duplicate below
   },
   externalReference: String, // For Flutterwave transaction ID
   
@@ -94,12 +94,17 @@ const transactionSchema = new mongoose.Schema({
 });
 
 // Indexes for performance
+// REMOVED: transactionSchema.index({ reference: 1 }); // This was the duplicate!
+// Keep only these necessary indexes:
 transactionSchema.index({ userId: 1, createdAt: -1 });
-transactionSchema.index({ reference: 1 });
 transactionSchema.index({ status: 1 });
 transactionSchema.index({ type: 1 });
 transactionSchema.index({ createdAt: -1 });
 transactionSchema.index({ walletId: 1 });
+
+// Optional: Compound indexes for common queries
+transactionSchema.index({ userId: 1, status: 1 });
+transactionSchema.index({ walletId: 1, createdAt: -1 });
 
 // Virtual for formatted amount
 transactionSchema.virtual('formattedAmount').get(function() {

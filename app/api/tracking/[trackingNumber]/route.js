@@ -1,6 +1,6 @@
 // app/api/tracking/[trackingNumber]/route.js
 import { NextResponse } from 'next/server';
-import connectToDatabase from "../../../lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 import ScheduledGift from '@/models/ScheduledGift';
 ;
 
@@ -16,7 +16,7 @@ export async function GET(request, { params }) {
     }
     
     // Connect to MongoDB
-    await connectToDatabase();
+    await connectDB();
     
     // Find scheduled gift by tracking number
     const gift = await ScheduledGift.findOne({ 
